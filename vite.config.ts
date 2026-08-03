@@ -212,6 +212,11 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      // Direct alias to the standalone landing page folder (kept separate for future updates)
+      "@landing": path.resolve(import.meta.dirname, "landing page"),
+      // Next.js shims — let landing page components run inside Vite without Next.js
+      "next/link": path.resolve(import.meta.dirname, "client", "src", "shims", "NextLink.tsx"),
+      "next/image": path.resolve(import.meta.dirname, "client", "src", "shims", "NextImage.tsx"),
     },
   },
   envDir: path.resolve(import.meta.dirname),
