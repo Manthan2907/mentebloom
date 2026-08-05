@@ -90,8 +90,3 @@ MindMate bridges this gap by combining mental wellness tools with academic stres
 * Calendar integration
 * Personalized wellness recommendations
 
----
-
-## 👥 Team
-
-Developed as a college hackathon project to promote student mental well-being through technology.
