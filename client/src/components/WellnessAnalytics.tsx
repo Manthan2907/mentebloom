@@ -4,7 +4,7 @@
  */
 import { motion } from "framer-motion";
 import { TrendingUp, BarChart3, BookOpen, Target } from "lucide-react";
-import { useStore, getWeeklyPulse } from "@/lib/store";
+import { useStore, getWeeklyPulse, getTodayIndex } from "@/lib/store";
 
 const MOOD_VALUES: Record<string, number> = {
   great: 5,
@@ -50,11 +50,16 @@ export function WellnessAnalytics() {
     ? `You completed habits on ${completedDays} of 7 days.`
     : "";
 
-  const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const bestMoodIdx = moodTrend.indexOf(Math.max(...moodTrend));
-  const happiestInsight = moodTrend[bestMoodIdx] >= 4
-    ? `You were happiest on ${dayNames[bestMoodIdx]}.`
-    : "";
+  let happiestInsight = "";
+  if (moodTrend[bestMoodIdx] >= 4) {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - bestMoodIdx));
+    const bestMoodDayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
+    happiestInsight = `You were happiest on ${bestMoodDayName}.`;
+  }
+
+  const todayIdx = getTodayIndex();
 
   return (
     <div className="bg-white rounded-xl border border-[#e8e4df] p-6 shadow-sm">
@@ -86,7 +91,9 @@ export function WellnessAnalytics() {
                 initial={{ height: 0 }}
                 animate={{ height: `${(val / 5) * 100}%` }}
                 transition={{ duration: 0.4, delay: i * 0.05 }}
-                className="flex-1 rounded-sm bg-[#c8f54e]/40 max-w-[18px]"
+                className={`flex-1 rounded-sm max-w-[18px] ${
+                  i === 6 ? "bg-[#c8f54e]" : "bg-[#c8f54e]/40"
+                }`}
               />
             ))}
           </div>
@@ -110,7 +117,7 @@ export function WellnessAnalytics() {
                 animate={{ height: `${(val / maxWater) * 100}%` }}
                 transition={{ duration: 0.4, delay: i * 0.05 }}
                 className={`flex-1 rounded-sm max-w-[18px] ${
-                  i === 6 ? "bg-[#38bdf8]" : "bg-[#38bdf8]/20"
+                  i === todayIdx ? "bg-[#38bdf8]" : "bg-[#38bdf8]/20"
                 }`}
               />
             ))}

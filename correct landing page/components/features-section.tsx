@@ -18,7 +18,7 @@ const impactStats = [
   { percentage: 95, label: "Build Self-Care Routine", description: "Small, daily steps turn into powerful wellness routines for mental health" },
 ]
 
-function AnimatedCounter({ target }) {
+function AnimatedCounter({ target }: { target: number }) {
   const [count, setCount] = useState(0)
 
   useEffect(() => {

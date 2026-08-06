@@ -1,5 +1,5 @@
 {
-  "include": ["client/src/**/*", "shared/**/*", "server/**/*", "landing page/**/*"],
+  "include": ["client/src/**/*", "shared/**/*", "server/**/*", "correct landing page/**/*"],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
     "incremental": true,
@@ -18,7 +18,7 @@
     "paths": {
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"],
-      "@landing/*": ["./landing page/*"],
+      "@landing/*": ["./correct landing page/*"],
       "next/link": ["./client/src/shims/NextLink.tsx"],
       "next/image": ["./client/src/shims/NextImage.tsx"]
     }

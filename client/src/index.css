@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@source "../../correct landing page";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,6 +44,7 @@
   --font-display: 'Playfair Display', serif;
   --font-sans: 'DM Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: var(--font-display);
 }
 
 :root {
@@ -111,10 +113,6 @@
     padding-right: 1rem;
   }
 
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
 
   @media (min-width: 640px) {
     .container {

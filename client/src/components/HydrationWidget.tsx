@@ -4,14 +4,14 @@
  */
 import { motion } from "framer-motion";
 import { Droplets, RotateCcw, Plus } from "lucide-react";
-import { useStore, DAY_SHORT } from "@/lib/store";
+import { useStore, DAY_SHORT, getTodayIndex } from "@/lib/store";
 
 const GOAL = 2000;
 
 export function HydrationWidget() {
   const { hydration, addWater, resetWater } = useStore();
   const percentage = Math.min((hydration.today / GOAL) * 100, 100);
-  const todayIdx = 6;
+  const todayIdx = getTodayIndex();
 
   return (
     <div className="bg-white rounded-xl border border-[#e8e4df] p-6 shadow-sm">

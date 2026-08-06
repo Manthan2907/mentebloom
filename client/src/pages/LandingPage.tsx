@@ -16,13 +16,7 @@ import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 
 // ─── Sections imported directly from the standalone landing page folder ────
-import { Header } from "@landing/components/header";
 import { HeroSection } from "@landing/components/hero-section";
-import { FeaturesSection } from "@landing/components/features-section";
-import { TestimonialsSection } from "@landing/components/testimonials-section";
-import { FAQSection } from "@landing/components/faq-section";
-import { StatsSection } from "@landing/components/stats-section";
-import { Footer } from "@landing/components/footer";
 
 // ─── Wrapper: intercepts button clicks and navigates to /app ──────────────
 interface NavWrapperProps {
@@ -61,35 +55,10 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/*
-       * Header: wrap so the CTA button ("List a property" / whatever the
-       * landing page calls it) navigates to /app in the Vite context.
-       */}
+    <main className="h-svh w-full overflow-hidden bg-background">
       <NavWrapper>
-        <Header />
+        <HeroSection />
       </NavWrapper>
-
-      <main>
-        {/*
-         * Hero: "Get Started" button navigates to /app.
-         * NavWrapper intercepts the click without touching the source file.
-         */}
-        <NavWrapper>
-          <HeroSection />
-        </NavWrapper>
-
-        {/* These sections are purely informational — no nav needed */}
-        <StatsSection />
-        <FeaturesSection />
-        <TestimonialsSection />
-        <FAQSection />
-      </main>
-
-      {/* Footer: wrap so any CTA links navigate to /app */}
-      <NavWrapper selector="button, a[href='#']">
-        <Footer />
-      </NavWrapper>
-    </div>
+    </main>
   );
 }

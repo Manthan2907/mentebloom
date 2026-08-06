@@ -138,7 +138,7 @@ export const useStore = create<AppState>()(
           const newCompletions = [...h.weekCompletions];
           newCompletions[dayIndex] = !newCompletions[dayIndex];
           const completedDays = newCompletions.filter(Boolean).length;
-          return { ...h, weekCompletions: newCompletions, monthlyCount: Math.min(h.monthlyTarget, h.monthlyCount + (newCompletions[dayIndex] ? 1 : -1)) };
+          return { ...h, weekCompletions: newCompletions, monthlyCount: Math.min(h.monthlyTarget, Math.max(0, h.monthlyCount + (newCompletions[dayIndex] ? 1 : -1))) };
         }),
         currentStreak: dayIndex === 6 ? state.currentStreak + 1 : state.currentStreak,
       })),
@@ -193,14 +193,16 @@ export const useStore = create<AppState>()(
       // Hydration
       hydration: { today: 1250, week: [1800, 2100, 1500, 2500, 1900, 2200, 1250] },
       addWater: (amount) => set((state) => {
+        const todayIdx = getTodayIndex();
         const newToday = state.hydration.today + amount;
         const newWeek = [...state.hydration.week];
-        newWeek[6] = newToday;
+        newWeek[todayIdx] = newToday;
         return { hydration: { today: newToday, week: newWeek } };
       }),
       resetWater: () => set((state) => {
+        const todayIdx = getTodayIndex();
         const newWeek = [...state.hydration.week];
-        newWeek[6] = 0;
+        newWeek[todayIdx] = 0;
         return { hydration: { today: 0, week: newWeek } };
       }),
 

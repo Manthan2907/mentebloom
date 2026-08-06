@@ -5,36 +5,23 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
-import { useStore, getTodayIndex } from "@/lib/store";
+import { useStore, getTodayIndex, calculateWellnessScore } from "@/lib/store";
 
 export function WellnessScore() {
   const state = useStore();
 
   const score = useMemo(() => {
-    let s = 0;
-    if (state.todayMood === "great") s += 25;
-    else if (state.todayMood === "good") s += 20;
-    else if (state.todayMood === "okay") s += 12;
-    else if (state.todayMood === "low") s += 6;
-    else if (state.todayMood === "sad") s += 3;
-
-    const todayIdx = getTodayIndex();
-    const completedToday = state.habits.filter((h) => h.weekCompletions[todayIdx]).length;
-    if (state.habits.length > 0) {
-      s += Math.round((completedToday / state.habits.length) * 25);
-    }
-
-    const waterPct = Math.min(state.hydration.today / 2000, 1);
-    s += Math.round(waterPct * 25);
-
-    const today = new Date().toISOString().split("T")[0];
-    if (state.journalEntries.some((e) => e.date === today)) s += 25;
-
-    return Math.min(100, s);
-  }, [state.todayMood, state.habits, state.hydration.today, state.journalEntries]);
+    return calculateWellnessScore(state);
+  }, [state]);
 
   const circumference = 2 * Math.PI * 36;
   const offset = circumference - (score / 100) * circumference;
+
+  const todayIdx = getTodayIndex();
+  const completedToday = state.habits.filter((h) => h.weekCompletions[todayIdx]).length;
+  const habitPct = state.habits.length > 0 ? Math.round((completedToday / state.habits.length) * 100) : 0;
+  
+  const todayDateStr = new Date().toISOString().split("T")[0];
 
   return (
     <div className="bg-white rounded-xl border border-[#e8e4df] p-6 shadow-sm">
@@ -72,9 +59,9 @@ export function WellnessScore() {
         {/* Breakdown */}
         <div className="space-y-1.5 flex-1">
           <BreakdownRow label="Mood" pct={state.todayMood === "great" ? 100 : state.todayMood === "good" ? 80 : state.todayMood === "okay" ? 48 : state.todayMood === "low" ? 24 : state.todayMood === "sad" ? 12 : 0} color="#8b5cf6" />
-          <BreakdownRow label="Habits" pct={state.habits.length > 0 ? Math.round((state.habits.filter((h) => h.weekCompletions.filter(Boolean).length > 0).length / state.habits.length) * 100) : 0} color="#c8f54e" />
+          <BreakdownRow label="Habits" pct={habitPct} color="#c8f54e" />
           <BreakdownRow label="Water" pct={Math.min(Math.round((state.hydration.today / 2000) * 100), 100)} color="#38bdf8" />
-          <BreakdownRow label="Journal" pct={state.journalEntries.some((e) => e.date === new Date().toISOString().split("T")[0]) ? 100 : 0} color="#eab308" />
+          <BreakdownRow label="Journal" pct={state.journalEntries.some((e) => e.date === todayDateStr) ? 100 : 0} color="#eab308" />
         </div>
       </div>
     </div>
