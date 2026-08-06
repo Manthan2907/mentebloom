@@ -1,10 +1,8 @@
-/**
- * TopNav — Editorial Theme navigation
- * Light cream background, green logo, theme tabs, dark CTA button
- */
-import { Calendar, Star } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { Calendar, Brain, LayoutDashboard, HeartHandshake, Sparkles } from "lucide-react";
 
 export function TopNav() {
+  const [location] = useLocation();
   const today = new Date();
   const dateStr = today.toLocaleDateString("en-US", {
     weekday: "long",
@@ -13,35 +11,75 @@ export function TopNav() {
     day: "numeric",
   });
 
+  const isAcademic = location.includes("academic");
+  const isConsultation = location.includes("consultation");
+  const isMeditation = location.includes("meditation");
+  const isDashboard = !isAcademic && !isConsultation && !isMeditation;
+
   return (
     <header className="bg-[#faf8f5] border-b border-[#e8e4df] sticky top-0 z-50">
       <div className="container max-w-[1280px] mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-14">
-          {/* Left — Logo */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
+          {/* Left — Logo & Header Nav Headings */}
+          <div className="flex items-center gap-5">
+            <Link href="/" className="flex items-center gap-1.5 cursor-pointer">
               <div className="w-5 h-5 bg-[#c8f54e] rounded-sm flex items-center justify-center">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                   <path d="M3 6l2 2 4-4" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
               <span className="font-display font-bold text-base text-[#1a1a1a]">
-                MyHabits.io
+                Mentebloom
               </span>
-            </div>
+            </Link>
 
-            {/* Theme tabs */}
-            <div className="hidden md:flex items-center gap-1 ml-4">
-              <button className="text-[10px] font-mono tracking-wider text-[#1a1a1a]/40 px-2 py-1 hover:text-[#1a1a1a]/60 transition-colors">
-                PASTEL
-              </button>
-              <button className="text-[10px] font-mono tracking-wider text-[#1a1a1a] bg-[#c8f54e] px-2.5 py-1 rounded-sm font-semibold">
-                EDITORIAL
-              </button>
-              <button className="text-[10px] font-mono tracking-wider text-[#1a1a1a]/40 px-2 py-1 hover:text-[#1a1a1a]/60 transition-colors">
-                ALMANAC
-              </button>
-            </div>
+            {/* Feature Headings on Header */}
+            <nav className="flex items-center gap-1 ml-2">
+              <Link
+                href="/app"
+                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md transition-colors ${
+                  isDashboard
+                    ? "bg-[#1a1a1a] text-white font-semibold shadow-sm"
+                    : "text-[#1a1a1a]/60 hover:text-[#1a1a1a] hover:bg-[#e8e4df]/40"
+                }`}
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                DASHBOARD
+              </Link>
+              <Link
+                href="/app/academic-stress"
+                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md transition-colors ${
+                  isAcademic
+                    ? "bg-[#c8f54e] text-[#1a1a1a] font-bold shadow-sm"
+                    : "text-[#1a1a1a]/60 hover:text-[#1a1a1a] hover:bg-[#e8e4df]/40"
+                }`}
+              >
+                <Brain className="w-3.5 h-3.5 text-[#1a1a1a]" />
+                ACADEMIC STRESS
+              </Link>
+              <Link
+                href="/app/consultation"
+                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md transition-colors ${
+                  isConsultation
+                    ? "bg-[#c8f54e] text-[#1a1a1a] font-bold shadow-sm"
+                    : "text-[#1a1a1a]/60 hover:text-[#1a1a1a] hover:bg-[#e8e4df]/40"
+                }`}
+              >
+                <HeartHandshake className="w-3.5 h-3.5 text-[#1a1a1a]" />
+                CONSULTATION
+              </Link>
+              <Link
+                href="/app/meditation"
+                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md transition-colors ${
+                  isMeditation
+                    ? "bg-[#c8f54e] text-[#1a1a1a] font-bold shadow-sm"
+                    : "text-[#1a1a1a]/60 hover:text-[#1a1a1a] hover:bg-[#e8e4df]/40"
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#1a1a1a]" />
+                MEDITATION
+              </Link>
+            </nav>
           </div>
 
           {/* Center — Date */}
@@ -52,24 +90,12 @@ export function TopNav() {
 
           {/* Right — Navigation */}
           <nav className="flex items-center gap-4">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="text-xs text-[#1a1a1a]/40 hover:text-[#1a1a1a]/70 transition-colors font-mono"
             >
               ← Home
-            </a>
-            <a
-              href="#"
-              className="text-xs text-[#1a1a1a]/40 hover:text-[#1a1a1a]/70 transition-colors font-mono"
-            >
-              Sign in
-            </a>
-            <a
-              href="#"
-              className="text-xs font-mono bg-[#1a1a1a] text-white px-4 py-1.5 rounded-sm hover:bg-[#2a2a2a] transition-colors"
-            >
-              Get it · from $3.99
-            </a>
+            </Link>
           </nav>
         </div>
       </div>

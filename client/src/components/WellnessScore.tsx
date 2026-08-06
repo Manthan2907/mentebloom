@@ -17,11 +17,9 @@ export function WellnessScore() {
   const circumference = 2 * Math.PI * 36;
   const offset = circumference - (score / 100) * circumference;
 
-  const todayIdx = getTodayIndex();
-  const completedToday = state.habits.filter((h) => h.weekCompletions[todayIdx]).length;
-  const habitPct = state.habits.length > 0 ? Math.round((completedToday / state.habits.length) * 100) : 0;
-  
   const todayDateStr = new Date().toISOString().split("T")[0];
+  const completedToday = state.habits.filter((h) => h.history && h.history[todayDateStr]).length;
+  const habitPct = state.habits.length > 0 ? Math.round((completedToday / state.habits.length) * 100) : 0;
 
   return (
     <div className="bg-white rounded-xl border border-[#e8e4df] p-6 shadow-sm">

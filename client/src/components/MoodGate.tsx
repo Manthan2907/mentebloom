@@ -402,7 +402,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
               className="mt-10 flex items-center gap-2"
             >
               <div className="w-8 h-0.5 bg-[#c8f54e]" />
-              <span className="text-xs font-mono tracking-wider text-[#1a1a1a]/40 uppercase">MyHabits</span>
+              <span className="text-xs font-mono tracking-wider text-[#1a1a1a]/40 uppercase">Mentebloom</span>
               <div className="w-8 h-0.5 bg-[#c8f54e]" />
             </motion.div>
           </motion.div>

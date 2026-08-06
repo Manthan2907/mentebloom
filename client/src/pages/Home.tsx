@@ -1,5 +1,5 @@
 /**
- * MyHabits — Mental Wellness Edition
+ * Mentebloom — Mental Wellness Edition
  * Editorial Theme: LIGHT cream/white background, dark text, lime green accents
  * Today's Note is the ONLY dark card (black bg with white/green text)
  * MoodGate appears first as full-screen overlay, then reveals the dashboard
@@ -34,7 +34,7 @@ const itemVariants: Variants = {
 };
 
 function getGateKey(): string {
-  return `myhabits_gate_${new Date().toISOString().split("T")[0]}`;
+  return `mentebloom_gate_${new Date().toISOString().split("T")[0]}`;
 }
 
 export default function Home() {

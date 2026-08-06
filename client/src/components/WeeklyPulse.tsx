@@ -4,17 +4,27 @@
  */
 import { motion } from "framer-motion";
 import { TrendingDown, TrendingUp } from "lucide-react";
-import { useStore, getWeeklyPulse, getTodayIndex } from "@/lib/store";
+import { useStore, getWeeklyPulse, getTodayIndex, getLastWeekPulse } from "@/lib/store";
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 export function WeeklyPulse() {
   const { habits } = useStore();
   const pulse = getWeeklyPulse(habits);
+  const lastWeekPulse = getLastWeekPulse(habits);
   const todayIdx = getTodayIndex();
   const maxPulse = Math.max(...pulse, 1);
-  const avgPulse = Math.round(pulse.reduce((a, b) => a + b, 0) / pulse.length);
-  const lastWeekAvg = 62;
+  
+  const pulseUpToToday = pulse.slice(0, todayIdx + 1);
+  const avgPulse = pulseUpToToday.length > 0 
+    ? Math.round(pulseUpToToday.reduce((a, b) => a + b, 0) / pulseUpToToday.length)
+    : 0;
+    
+  const lastWeekPulseUpToToday = lastWeekPulse.slice(0, todayIdx + 1);
+  const lastWeekAvg = lastWeekPulseUpToToday.length > 0
+    ? Math.round(lastWeekPulseUpToToday.reduce((a, b) => a + b, 0) / lastWeekPulseUpToToday.length)
+    : 0;
+    
   const change = avgPulse - lastWeekAvg;
 
   return (

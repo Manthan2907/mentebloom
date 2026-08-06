@@ -114,7 +114,7 @@ export function WellnessAnalytics() {
               <motion.div
                 key={i}
                 initial={{ height: 0 }}
-                animate={{ height: `${(val / maxWater) * 100}%` }}
+                animate={{ height: `${i > todayIdx ? 0 : (val / maxWater) * 100}%` }}
                 transition={{ duration: 0.4, delay: i * 0.05 }}
                 className={`flex-1 rounded-sm max-w-[18px] ${
                   i === todayIdx ? "bg-[#38bdf8]" : "bg-[#38bdf8]/20"
