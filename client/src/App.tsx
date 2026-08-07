@@ -48,7 +48,9 @@ function App() {
         <ThemeProvider defaultTheme="light">
           <TooltipProvider>
             <Toaster />
-            <Router />
+            <Suspense fallback={<RouteLoading />}>
+              <Router />
+            </Suspense>
           </TooltipProvider>
         </ThemeProvider>
       </ErrorBoundary>

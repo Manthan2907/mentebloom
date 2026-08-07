@@ -4,25 +4,34 @@
  * Today's Note is the ONLY dark card (black bg with white/green text)
  * MoodGate appears first as full-screen overlay, then reveals the dashboard
  */
-import { useState } from "react";
-import { TopNav } from "@/components/TopNav";
-import { HeroSection } from "@/components/HeroSection";
-import { HabitsTable } from "@/components/HabitsTable";
-import { TodaysNote } from "@/components/TodaysNote";
-import { IntentionsWidget } from "@/components/IntentionsWidget";
-import { WeeklyPulse } from "@/components/WeeklyPulse";
-import { MilestonesWidget } from "@/components/MilestonesWidget";
-import { StreakFooter } from "@/components/StreakFooter";
-import { HydrationWidget } from "@/components/HydrationWidget";
-import { JournalWidget } from "@/components/JournalWidget";
-import { WellnessAnalytics } from "@/components/WellnessAnalytics";
-import { WellnessScore } from "@/components/WellnessScore";
-import { MoodHistory } from "@/components/MoodHistory";
-import { QuoteWidget } from "@/components/QuoteWidget";
-import { AppFooter } from "@/components/AppFooter";
+import { lazy, Suspense, useState } from "react";
 import { MoodGate } from "@/components/MoodGate";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Variants } from "framer-motion";
+
+const TopNav = lazy(() => import("@/components/TopNav").then((module) => ({ default: module.TopNav })));
+const HeroSection = lazy(() => import("@/components/HeroSection").then((module) => ({ default: module.HeroSection })));
+const HabitsTable = lazy(() => import("@/components/HabitsTable").then((module) => ({ default: module.HabitsTable })));
+const TodaysNote = lazy(() => import("@/components/TodaysNote").then((module) => ({ default: module.TodaysNote })));
+const IntentionsWidget = lazy(() => import("@/components/IntentionsWidget").then((module) => ({ default: module.IntentionsWidget })));
+const WeeklyPulse = lazy(() => import("@/components/WeeklyPulse").then((module) => ({ default: module.WeeklyPulse })));
+const MilestonesWidget = lazy(() => import("@/components/MilestonesWidget").then((module) => ({ default: module.MilestonesWidget })));
+const StreakFooter = lazy(() => import("@/components/StreakFooter").then((module) => ({ default: module.StreakFooter })));
+const HydrationWidget = lazy(() => import("@/components/HydrationWidget").then((module) => ({ default: module.HydrationWidget })));
+const JournalWidget = lazy(() => import("@/components/JournalWidget").then((module) => ({ default: module.JournalWidget })));
+const WellnessAnalytics = lazy(() => import("@/components/WellnessAnalytics").then((module) => ({ default: module.WellnessAnalytics })));
+const WellnessScore = lazy(() => import("@/components/WellnessScore").then((module) => ({ default: module.WellnessScore })));
+const MoodHistory = lazy(() => import("@/components/MoodHistory").then((module) => ({ default: module.MoodHistory })));
+const QuoteWidget = lazy(() => import("@/components/QuoteWidget").then((module) => ({ default: module.QuoteWidget })));
+const AppFooter = lazy(() => import("@/components/AppFooter").then((module) => ({ default: module.AppFooter })));
+
+function DashboardLoading() {
+  return (
+    <div className="grid min-h-[60vh] place-items-center text-sm text-[#1a1a1a]/50" role="status" aria-live="polite">
+      Loading your dashboard…
+    </div>
+  );
+}
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 12 },
@@ -37,11 +46,33 @@ function getGateKey(): string {
   return `mentebloom_gate_${new Date().toISOString().split("T")[0]}`;
 }
 
+function hasCompletedTodayCheckIn(): boolean {
+  try {
+    return window.localStorage.getItem(getGateKey()) === "done";
+  } catch {
+    return false;
+  }
+}
+
 export default function Home() {
-  const [gateDone, setGateDone] = useState<boolean>(false);
+  const [gateDone, setGateDone] = useState<boolean>(hasCompletedTodayCheckIn);
 
   const handleGateComplete = () => {
+    try {
+      window.localStorage.setItem(getGateKey(), "done");
+    } catch {
+      // Continue without persistence when storage is unavailable.
+    }
     setGateDone(true);
+  };
+
+  const handleResetCheckIn = () => {
+    try {
+      window.localStorage.removeItem(getGateKey());
+    } catch {
+      // Continue without persistence when storage is unavailable.
+    }
+    setGateDone(false);
   };
 
   return (
@@ -56,7 +87,8 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <TopNav />
+            <Suspense fallback={<DashboardLoading />}>
+              <TopNav onResetCheckIn={handleResetCheckIn} />
 
             <main className="container max-w-[1280px] mx-auto px-4 lg:px-8 pb-8">
               {/* Hero Section */}
@@ -122,7 +154,8 @@ export default function Home() {
               </motion.div>
             </main>
 
-            <AppFooter />
+              <AppFooter />
+            </Suspense>
           </motion.div>
         )}
       </AnimatePresence>

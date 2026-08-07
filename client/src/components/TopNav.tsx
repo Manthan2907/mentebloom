@@ -2,7 +2,11 @@ import { Link, useLocation } from "wouter";
 import { Calendar } from "lucide-react";
 import PillNav from "./PillNav";
 
-export function TopNav() {
+interface TopNavProps {
+  onResetCheckIn?: () => void;
+}
+
+export function TopNav({ onResetCheckIn }: TopNavProps) {
   const [location] = useLocation();
   const today = new Date();
   const dateStr = today.toLocaleDateString("en-US", {
@@ -56,6 +60,15 @@ export function TopNav() {
 
           {/* Right — Navigation */}
           <nav className="flex items-center gap-4">
+            {onResetCheckIn && location === "/app" && (
+              <button
+                type="button"
+                onClick={onResetCheckIn}
+                className="hidden sm:inline text-xs text-[#1a1a1a]/40 hover:text-[#1a1a1a]/70 transition-colors font-mono"
+              >
+                Redo check-in
+              </button>
+            )}
             <Link
               href="/"
               className="text-xs text-[#1a1a1a]/40 hover:text-[#1a1a1a]/70 transition-colors font-mono"
