@@ -22,7 +22,7 @@ function RouteLoading() {
     <main className="grid min-h-screen place-items-center bg-background px-6 text-foreground">
       <div className="flex items-center gap-3" role="status" aria-live="polite">
         <span className="size-2 animate-pulse rounded-full bg-primary" aria-hidden="true" />
-        <span className="text-sm text-muted-foreground">Loading your wellness space…</span>
+        <span className="text-sm text-muted-foreground">Opening your wellness space…</span>
       </div>
     </main>
   );

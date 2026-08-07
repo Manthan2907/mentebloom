@@ -15,6 +15,10 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 
+const preloadDashboard = () => {
+  void import("./Home");
+};
+
 // ─── Sections imported directly from the standalone landing page folder ────
 import { HeroSection } from "@landing/components/hero-section";
 
@@ -37,21 +41,35 @@ function NavWrapper({ children, selector = "button" }: NavWrapperProps) {
       const target = e.target as HTMLElement;
       if (target.closest(selector)) {
         e.preventDefault();
+        preloadDashboard();
         navigate("/app");
       }
     };
+    const preloadOnIntent = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target.closest(selector)) preloadDashboard();
+    };
 
     container.addEventListener("click", handler);
-    return () => container.removeEventListener("click", handler);
+    container.addEventListener("pointerenter", preloadOnIntent, true);
+    container.addEventListener("focusin", preloadOnIntent);
+    return () => {
+      container.removeEventListener("click", handler);
+      container.removeEventListener("pointerenter", preloadOnIntent, true);
+      container.removeEventListener("focusin", preloadOnIntent);
+    };
   }, [navigate, selector]);
 
   return <div ref={ref}>{children}</div>;
 }
 
 export default function LandingPage() {
-  // Reset scroll when landing page mounts
+  // Reset scroll and warm the dashboard chunk while the user reads the hero.
   useEffect(() => {
     window.scrollTo(0, 0);
+    const idle = window.setTimeout(preloadDashboard, 1200);
+
+    return () => window.clearTimeout(idle);
   }, []);
 
   return (
