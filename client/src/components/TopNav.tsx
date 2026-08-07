@@ -18,9 +18,13 @@ export function TopNav({ onResetCheckIn }: TopNavProps) {
 
   const navItems = [
     { label: "Dashboard", href: "/app" },
-    { label: "Academic Stress", href: "/app/academic-stress" },
-    { label: "Consultation", href: "/app/consultation" },
-    { label: "Meditation", href: "/app/meditation" }
+    { label: "Journal", href: "/app/journal" },
+    { label: "Analytics", href: "/app/analytics" },
+    { label: "Wellness", href: "/app/wellness" },
+    { label: "Focus", href: "/app/productivity" },
+    { label: "Academic", href: "/app/academic-stress" },
+    { label: "Meditation", href: "/app/meditation" },
+    { label: "Consult", href: "/app/consultation" },
   ];
 
   return (

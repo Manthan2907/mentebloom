@@ -67,6 +67,36 @@ export interface StressLevelInfo {
   description: string;
 }
 
+// ─── New feature types ───────────────────────────────────────────────────────
+
+export interface SleepEntry {
+  id: string;
+  date: string; // YYYY-MM-DD
+  hours: number;
+  quality: 1 | 2 | 3 | 4 | 5; // 1=Poor … 5=Excellent
+  notes: string;
+}
+
+export type ExerciseType = 'Running' | 'Yoga' | 'Gym' | 'Sports' | 'Walk' | 'Cycling' | 'Swimming' | 'Other';
+export type ExerciseIntensity = 'Low' | 'Medium' | 'High';
+
+export interface ExerciseSession {
+  id: string;
+  date: string;
+  type: ExerciseType;
+  durationMinutes: number;
+  intensity: ExerciseIntensity;
+}
+
+export interface PomodoroSession {
+  id: string;
+  date: string;
+  completedAt: string; // ISO timestamp
+  durationMinutes: number;
+  taskNote: string;
+  subjectId: string | null;
+}
+
 export interface AppState {
   // Habits
   habits: Habit[];
@@ -113,6 +143,24 @@ export interface AppState {
 
   // Quote
   currentQuote: { text: string; author: string };
+
+  // Sleep
+  sleepEntries: SleepEntry[];
+  addSleepEntry: (entry: Omit<SleepEntry, 'id'>) => void;
+  removeSleepEntry: (id: string) => void;
+
+  // Exercise
+  exerciseSessions: ExerciseSession[];
+  addExerciseSession: (session: Omit<ExerciseSession, 'id'>) => void;
+  removeExerciseSession: (id: string) => void;
+
+  // Pomodoro
+  pomodoroSessions: PomodoroSession[];
+  addPomodoroSession: (session: Omit<PomodoroSession, 'id'>) => void;
+
+  // Journal (enhanced – tag mood per entry)
+  updateJournalEntry: (id: string, content: string) => void;
+  removeJournalEntry: (id: string) => void;
 }
 
 const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -394,6 +442,61 @@ export const useStore = create<AppState>()(
 
       // Quote
       currentQuote: QUOTES[new Date().getDay() % QUOTES.length],
+
+      // Sleep
+      sleepEntries: Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        const hours = [6.5, 7, 8, 5.5, 7.5, 9, 6][i];
+        const quality = ([2, 3, 4, 2, 4, 5, 3] as const)[i];
+        return { id: `sl${i}`, date: d.toISOString().split('T')[0], hours, quality, notes: '' };
+      }),
+      addSleepEntry: (entry) => set((state) => ({
+        sleepEntries: [{ ...entry, id: generateId() }, ...state.sleepEntries],
+      })),
+      removeSleepEntry: (id) => set((state) => ({
+        sleepEntries: state.sleepEntries.filter((e) => e.id !== id),
+      })),
+
+      // Exercise
+      exerciseSessions: Array.from({ length: 5 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - i * 1.2);
+        const types: ExerciseType[] = ['Running', 'Yoga', 'Walk', 'Gym', 'Cycling'];
+        const intensities: ExerciseIntensity[] = ['Medium', 'Low', 'Low', 'High', 'Medium'];
+        const durations = [30, 45, 20, 60, 35];
+        return { id: `ex${i}`, date: d.toISOString().split('T')[0], type: types[i], durationMinutes: durations[i], intensity: intensities[i] };
+      }),
+      addExerciseSession: (session) => set((state) => ({
+        exerciseSessions: [{ ...session, id: generateId() }, ...state.exerciseSessions],
+      })),
+      removeExerciseSession: (id) => set((state) => ({
+        exerciseSessions: state.exerciseSessions.filter((s) => s.id !== id),
+      })),
+
+      // Pomodoro
+      pomodoroSessions: Array.from({ length: 4 }, (_, i) => {
+        const d = new Date();
+        return {
+          id: `pm${i}`,
+          date: d.toISOString().split('T')[0],
+          completedAt: new Date(d.getTime() - i * 30 * 60000).toISOString(),
+          durationMinutes: [25, 25, 5, 25][i],
+          taskNote: ['Algorithms reading', 'Problem set 3', 'Short break', 'Essay outline'][i],
+          subjectId: (['s1', 's1', null, 's4'] as (string | null)[])[i],
+        };
+      }),
+      addPomodoroSession: (session) => set((state) => ({
+        pomodoroSessions: [{ ...session, id: generateId() }, ...state.pomodoroSessions],
+      })),
+
+      // Journal extras
+      updateJournalEntry: (id, content) => set((state) => ({
+        journalEntries: state.journalEntries.map((e) => e.id === id ? { ...e, content } : e),
+      })),
+      removeJournalEntry: (id) => set((state) => ({
+        journalEntries: state.journalEntries.filter((e) => e.id !== id),
+      })),
     }),
     {
       name: 'mentebloom-v3-storage',

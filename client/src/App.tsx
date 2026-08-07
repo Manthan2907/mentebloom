@@ -11,6 +11,10 @@ const Home = lazy(() => import("./pages/Home"));
 const AcademicStress = lazy(() => import("./pages/AcademicStress"));
 const Consultation = lazy(() => import("./pages/Consultation"));
 const Meditation = lazy(() => import("./pages/Meditation"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Wellness = lazy(() => import("./pages/Wellness"));
+const Journal = lazy(() => import("./pages/Journal"));
+const Productivity = lazy(() => import("./pages/Productivity"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function RouteLoading() {
@@ -35,6 +39,10 @@ function Router() {
       <Route path={"/consultation"} component={Consultation} />
       <Route path={"/app/meditation"} component={Meditation} />
       <Route path={"/meditation"} component={Meditation} />
+      <Route path={"/app/analytics"} component={Analytics} />
+      <Route path={"/app/wellness"} component={Wellness} />
+      <Route path={"/app/journal"} component={Journal} />
+      <Route path={"/app/productivity"} component={Productivity} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
