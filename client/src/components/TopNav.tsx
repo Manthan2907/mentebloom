@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
-import { Calendar, Brain, LayoutDashboard, HeartHandshake, Sparkles } from "lucide-react";
+import { Calendar } from "lucide-react";
+import PillNav from "./PillNav";
 
 export function TopNav() {
   const [location] = useLocation();
@@ -11,10 +12,12 @@ export function TopNav() {
     day: "numeric",
   });
 
-  const isAcademic = location.includes("academic");
-  const isConsultation = location.includes("consultation");
-  const isMeditation = location.includes("meditation");
-  const isDashboard = !isAcademic && !isConsultation && !isMeditation;
+  const navItems = [
+    { label: "Dashboard", href: "/app" },
+    { label: "Academic Stress", href: "/app/academic-stress" },
+    { label: "Consultation", href: "/app/consultation" },
+    { label: "Meditation", href: "/app/meditation" }
+  ];
 
   return (
     <header className="bg-[#faf8f5] border-b border-[#e8e4df] sticky top-0 z-50">
@@ -33,53 +36,16 @@ export function TopNav() {
               </span>
             </Link>
 
-            {/* Feature Headings on Header */}
-            <nav className="flex items-center gap-1 ml-2">
-              <Link
-                href="/app"
-                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md transition-colors ${
-                  isDashboard
-                    ? "bg-[#1a1a1a] text-white font-semibold shadow-sm"
-                    : "text-[#1a1a1a]/60 hover:text-[#1a1a1a] hover:bg-[#e8e4df]/40"
-                }`}
-              >
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                DASHBOARD
-              </Link>
-              <Link
-                href="/app/academic-stress"
-                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md transition-colors ${
-                  isAcademic
-                    ? "bg-[#c8f54e] text-[#1a1a1a] font-bold shadow-sm"
-                    : "text-[#1a1a1a]/60 hover:text-[#1a1a1a] hover:bg-[#e8e4df]/40"
-                }`}
-              >
-                <Brain className="w-3.5 h-3.5 text-[#1a1a1a]" />
-                ACADEMIC STRESS
-              </Link>
-              <Link
-                href="/app/consultation"
-                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md transition-colors ${
-                  isConsultation
-                    ? "bg-[#c8f54e] text-[#1a1a1a] font-bold shadow-sm"
-                    : "text-[#1a1a1a]/60 hover:text-[#1a1a1a] hover:bg-[#e8e4df]/40"
-                }`}
-              >
-                <HeartHandshake className="w-3.5 h-3.5 text-[#1a1a1a]" />
-                CONSULTATION
-              </Link>
-              <Link
-                href="/app/meditation"
-                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-md transition-colors ${
-                  isMeditation
-                    ? "bg-[#c8f54e] text-[#1a1a1a] font-bold shadow-sm"
-                    : "text-[#1a1a1a]/60 hover:text-[#1a1a1a] hover:bg-[#e8e4df]/40"
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#1a1a1a]" />
-                MEDITATION
-              </Link>
-            </nav>
+            {/* Feature Headings on Header using React Bits PillNav */}
+            <PillNav
+              items={navItems}
+              activeHref={location}
+              baseColor="#1a1a1a"
+              pillColor="#f5f3ef"
+              pillTextColor="#1a1a1a"
+              hoveredPillTextColor="#c8f54e"
+              initialLoadAnimation={true}
+            />
           </div>
 
           {/* Center — Date */}

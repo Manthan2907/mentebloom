@@ -129,3 +129,100 @@
     }
   }
 }
+
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes gradient-rotate {
+  from {
+    --gradient-angle: 0deg;
+  }
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+.gradient-border-component {
+  position: relative;
+}
+
+.gradient-border-wrapper {
+  position: absolute;
+  inset: 0;
+  border: var(--border-width, 2px) solid transparent;
+  border-radius: var(--border-radius, 20px);
+  background: conic-gradient(
+    from var(--gradient-angle, 0deg),
+    var(--gradient-primary) 0%,
+    var(--gradient-secondary) 37%,
+    var(--gradient-accent) 30%,
+    var(--gradient-secondary) 33%,
+    var(--gradient-primary) 40%,
+    var(--gradient-primary) 50%,
+    var(--gradient-secondary) 77%,
+    var(--gradient-accent) 80%,
+    var(--gradient-secondary) 83%,
+    var(--gradient-primary) 90%
+  ) border-box;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gradient-border-auto {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+
+.gradient-border-hover {
+  --gradient-angle: 0deg;
+}
+
+.gradient-border-hover:hover {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+
+.gradient-border-stop-hover {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+
+.gradient-border-stop-hover:hover {
+  animation-play-state: paused;
+}
+
+/* Animated Glow Card Beams */
+@keyframes glow-top {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+@keyframes glow-right {
+  0% { top: -100%; }
+  100% { top: 100%; }
+}
+@keyframes glow-bottom {
+  0% { right: -100%; }
+  100% { right: 100%; }
+}
+@keyframes glow-left {
+  0% { bottom: -100%; }
+  100% { bottom: 100%; }
+}
+
+.animate-glow-top {
+  animation: glow-top 3.5s linear infinite;
+}
+.animate-glow-right {
+  animation: glow-right 3.5s linear infinite 0.875s;
+}
+.animate-glow-bottom {
+  animation: glow-bottom 3.5s linear infinite 1.75s;
+}
+.animate-glow-left {
+  animation: glow-left 3.5s linear infinite 2.625s;
+}
+

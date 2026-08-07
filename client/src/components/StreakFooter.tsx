@@ -5,6 +5,7 @@
 import { useStore, getWeeklyPulse } from "@/lib/store";
 import { Flame } from "lucide-react";
 import { motion } from "framer-motion";
+import { BorderRotate } from "@/components/ui/animated-gradient-border";
 
 export function StreakFooter() {
   const { currentStreak, habits } = useStore();
@@ -20,13 +21,19 @@ export function StreakFooter() {
   }));
 
   return (
-    <motion.div
-      className="rounded-xl p-6 relative overflow-hidden shadow-sm border border-orange-200/50"
-      animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-      transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-      style={{ 
-        background: "linear-gradient(270deg, #fde68a, #fbd38d, #f6ad55, #fbd38d, #fde68a)",
-        backgroundSize: "200% 200%" 
+    <BorderRotate
+      className="p-6 relative overflow-hidden backdrop-blur-md"
+      animationSpeed={6}
+      borderWidth={2}
+      borderRadius={12}
+      gradientColors={{
+        primary: '#fde68a',
+        secondary: '#f6ad55',
+        accent: '#fbd38d'
+      }}
+      backgroundColor="rgba(251, 236, 198, 0.65)"
+      style={{
+        boxShadow: "0 8px 32px 0 rgba(246, 173, 85, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.65)"
       }}
     >
       {/* Animated Embers / Sparks */}
@@ -100,6 +107,6 @@ export function StreakFooter() {
           ))}
         </div>
       </div>
-    </motion.div>
+    </BorderRotate>
   );
 }

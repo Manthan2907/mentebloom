@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { TopNav } from "@/components/TopNav";
 import { AppFooter } from "@/components/AppFooter";
+import { CardCanvas, Card } from "@/components/ui/animated-glow-card";
+import { FaqAccordion } from "@/components/ui/faq-chat-accordion";
+import { BorderGlow } from "@/components/ui/BorderGlow";
+import { Button6 } from "@/components/ui/button-6";
 import {
   useStore,
   calculateWellnessScore,
@@ -256,15 +260,15 @@ Notes for Counselor: Generated via Mentebloom Student Self-Tracking System.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <button
+            <Button6
               onClick={() => setShowReportModal(true)}
-              className="flex items-center gap-2 bg-[#c8f54e] hover:bg-[#b5e43b] text-[#1a1a1a] px-4 py-2.5 rounded-xl font-mono text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
+              hoverBgColor="#c8f54e"
+              hoverTextColor="#1a1a1a"
+              className="border-[#1a1a1a]"
             >
-              <FileText className="w-4 h-4 text-[#1a1a1a]" />
+              <FileText className="w-4 h-4" />
               GENERATE WELLNESS REPORT
-            </button>
-          </div>
+            </Button6>
         </div>
 
         {/* Top Banner Alert for Emergency Crisis */}
@@ -348,7 +352,7 @@ Notes for Counselor: Generated via Mentebloom Student Self-Tracking System.
               </div>
             </div>
 
-            {/* Counselor Cards Grid */}
+            {/* Counselor Cards Grid with BorderGlow */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {filteredCounselors.map((counselor) => (
                 <motion.div
@@ -356,166 +360,152 @@ Notes for Counselor: Generated via Mentebloom Student Self-Tracking System.
                   layout
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-2xl border border-[#e8e4df] p-6 shadow-sm flex flex-col justify-between space-y-5 hover:border-[#1a1a1a]/20 transition-all"
                 >
-                  <div className="space-y-4">
-                    {/* Counselor Header */}
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-display text-xl font-bold shrink-0 relative shadow-sm"
-                        style={{ backgroundColor: counselor.imageColor }}
-                      >
-                        {counselor.name.split(" ")[1]?.[0] || "C"}
-                        <span className="absolute -bottom-1 -right-1 bg-white p-0.5 rounded-full">
-                          <CheckCircle2 className="w-4 h-4 text-[#22c55e] fill-[#22c55e]/20" />
-                        </span>
-                      </div>
+                  <BorderGlow
+                    edgeSensitivity={30}
+                    glowColor="0 0 15"
+                    backgroundColor="#ffffff"
+                    borderRadius={16}
+                    glowRadius={35}
+                    glowIntensity={1.8}
+                    coneSpread={25}
+                    animated={false}
+                    colors={["#1a1a1a", "#404040", "#1a1a1a"]}
+                  >
+                    <div className="p-6 flex flex-col justify-between space-y-5 h-full">
+                      <div className="space-y-4">
+                        {/* Counselor Header */}
+                        <div className="flex items-start gap-4">
+                          <div
+                            className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-display text-xl font-bold shrink-0 relative shadow-sm"
+                            style={{ backgroundColor: counselor.imageColor }}
+                          >
+                            {counselor.name.split(" ")[1]?.[0] || "C"}
+                            <span className="absolute -bottom-1 -right-1 bg-white p-0.5 rounded-full">
+                              <CheckCircle2 className="w-4 h-4 text-[#22c55e] fill-[#22c55e]/20" />
+                            </span>
+                          </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <h3 className="font-display font-bold text-base text-[#1a1a1a] truncate">
-                            {counselor.name}
-                          </h3>
-                          <div className="flex items-center gap-1 bg-[#faf8f5] px-2 py-0.5 rounded-md border border-[#e8e4df]/60 text-xs font-mono">
-                            <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                            <span className="font-bold">{counselor.rating}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <h3 className="font-display font-bold text-base text-[#1a1a1a] truncate">
+                                {counselor.name}
+                              </h3>
+                              <div className="flex items-center gap-1 bg-[#faf8f5] px-2 py-0.5 rounded-md border border-[#e8e4df]/60 text-xs font-mono">
+                                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                <span className="font-bold">{counselor.rating}</span>
+                              </div>
+                            </div>
+
+                            <p className="text-xs font-mono text-[#1a1a1a]/50">
+                              {counselor.title} · {counselor.experienceYears}+ yrs exp
+                            </p>
+
+                            <div className="flex items-center gap-2 mt-2">
+                              <span
+                                className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md ${
+                                  counselor.mode === "Online"
+                                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                    : counselor.mode === "Offline"
+                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                    : "bg-purple-50 text-purple-700 border border-purple-200"
+                                }`}
+                              >
+                                {counselor.mode === "Both"
+                                  ? "Online Video & In-Person"
+                                  : counselor.mode === "Online"
+                                  ? "Online Video Only"
+                                  : "In-Person Campus Clinic"}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
-                        <p className="text-xs font-mono text-[#1a1a1a]/50">
-                          {counselor.title} · {counselor.experienceYears}+ yrs exp
-                        </p>
-
-                        <div className="flex items-center gap-2 mt-2">
-                          <span
-                            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md ${
-                              counselor.mode === "Online"
-                                ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                : counselor.mode === "Offline"
-                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                : "bg-purple-50 text-purple-700 border border-purple-200"
-                            }`}
-                          >
-                            {counselor.mode === "Both"
-                              ? "Online Video & In-Person"
-                              : counselor.mode === "Online"
-                              ? "Online Video Only"
-                              : "In-Person Campus Clinic"}
+                        {/* Specializations Tags */}
+                        <div>
+                          <span className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase block mb-1.5 font-semibold">
+                            SPECIALIZATIONS
                           </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {counselor.specializations.map((spec) => (
+                              <span
+                                key={spec}
+                                className="text-[11px] font-sans bg-[#f5f3ef] text-[#1a1a1a]/80 px-2.5 py-1 rounded-lg border border-[#e8e4df]/40"
+                              >
+                                {spec}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Location & Availability info */}
+                        <div className="space-y-1.5 text-xs font-mono text-[#1a1a1a]/60 bg-[#faf8f5] p-3 rounded-xl border border-[#e8e4df]/60">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5 text-[#c8f54e] fill-[#1a1a1a]" />
+                            <span className="font-bold text-[#1a1a1a]">
+                              {counselor.availability}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#1a1a1a]/40">
+                            <MapPin className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">{counselor.location}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Specializations Tags */}
-                    <div>
-                      <span className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase block mb-1.5 font-semibold">
-                        SPECIALIZATIONS
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {counselor.specializations.map((spec) => (
-                          <span
-                            key={spec}
-                            className="text-[11px] font-sans bg-[#f5f3ef] text-[#1a1a1a]/80 px-2.5 py-1 rounded-lg border border-[#e8e4df]/40"
-                          >
-                            {spec}
-                          </span>
-                        ))}
-                      </div>
+                      {/* Book Action Button */}
+                      <Button6
+                        onClick={() => {
+                          setSelectedCounselor(counselor);
+                          setBookingMode(
+                            counselor.mode === "Offline" ? "Offline" : "Online"
+                          );
+                          setShowBookingModal(true);
+                        }}
+                        hoverBgColor="#c8f54e"
+                        hoverTextColor="#1a1a1a"
+                        className="w-full mt-3 border-[#1a1a1a]"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        BOOK CONSULTATION
+                      </Button6>
                     </div>
-
-                    {/* Location & Availability info */}
-                    <div className="space-y-1.5 text-xs font-mono text-[#1a1a1a]/60 bg-[#faf8f5] p-3 rounded-xl border border-[#e8e4df]/60">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5 text-[#c8f54e] fill-[#1a1a1a]" />
-                        <span className="font-bold text-[#1a1a1a]">
-                          {counselor.availability}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[11px] text-[#1a1a1a]/40">
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">{counselor.location}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Book Action Button */}
-                  <button
-                    onClick={() => {
-                      setSelectedCounselor(counselor);
-                      setBookingMode(
-                        counselor.mode === "Offline" ? "Offline" : "Online"
-                      );
-                      setShowBookingModal(true);
-                    }}
-                    className="w-full bg-[#1a1a1a] hover:bg-[#333] text-white py-2.5 rounded-xl font-mono text-xs font-bold transition-all shadow-xs active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Calendar className="w-4 h-4 text-[#c8f54e]" />
-                    BOOK CONSULTATION
-                  </button>
+                  </BorderGlow>
                 </motion.div>
               ))}
             </div>
           </div>
 
-          {/* Section 2: Student Wellness FAQs */}
-          <div className="bg-white rounded-2xl border border-[#e8e4df] p-6 shadow-sm space-y-6">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-mono tracking-widest uppercase bg-[#c8f54e] text-[#1a1a1a] px-2 py-0.5 rounded-sm font-bold">
-                  STUDENT GUIDANCE
-                </span>
-              </div>
-              <h2 className="font-display text-2xl font-extrabold text-[#1a1a1a]">
-                Student Wellness FAQs
-              </h2>
-              <p className="text-xs font-mono text-[#1a1a1a]/40 uppercase mt-0.5">
-                COMMON QUESTIONS ABOUT COUNSELING, BURNOUT, AND EXAM PRESSURE
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              {FAQS.map((faq, idx) => {
-                const isOpen = openFaqIndex === idx;
-                return (
-                  <div
-                    key={faq.question}
-                    className="border border-[#e8e4df] rounded-xl overflow-hidden transition-all bg-[#faf8f5]"
-                  >
-                    <button
-                      onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                      className="w-full p-4 text-left flex items-center justify-between gap-4 font-display text-sm font-bold text-[#1a1a1a] hover:bg-[#f0ece7] transition-colors cursor-pointer"
-                    >
-                      <span className="flex items-center gap-3">
-                        <span className="text-xs font-mono text-[#1a1a1a]/30 font-normal">
-                          0{idx + 1}.
-                        </span>
-                        {faq.question}
-                      </span>
-                      {isOpen ? (
-                        <ChevronUp className="w-4 h-4 text-[#1a1a1a]/40 shrink-0" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-[#1a1a1a]/40 shrink-0" />
-                      )}
-                    </button>
-
-                    <AnimatePresence>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.25 }}
-                          className="px-4 pb-4 pt-1 text-xs font-sans text-[#1a1a1a]/70 leading-relaxed border-t border-[#e8e4df]/50 bg-white"
-                        >
-                          {faq.answer}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+          {/* Section 2: Student Wellness FAQs with FaqAccordion */}
+          <CardCanvas>
+            <Card className="shadow-sm">
+              <div className="p-6 space-y-4 bg-white rounded-2xl border border-[#e8e4df]/60">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-mono tracking-widest uppercase bg-[#c8f54e] text-[#1a1a1a] px-2 py-0.5 rounded-sm font-bold">
+                      STUDENT GUIDANCE
+                    </span>
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                  <h2 className="font-display text-2xl font-extrabold text-[#1a1a1a]">
+                    Student Wellness FAQs
+                  </h2>
+                  <p className="text-xs font-mono text-[#1a1a1a]/40 uppercase mt-0.5">
+                    COMMON QUESTIONS ABOUT COUNSELING, BURNOUT, AND EXAM PRESSURE
+                  </p>
+                </div>
+
+                <FaqAccordion
+                  data={FAQS.map((faq, idx) => ({
+                    id: idx + 1,
+                    question: `0${idx + 1}. ${faq.question}`,
+                    answer: faq.answer,
+                  }))}
+                  timestamp="UPDATED DAILY • STUDENT WELLNESS ADVISORY"
+                  className="p-0"
+                />
+              </div>
+            </Card>
+          </CardCanvas>
         </div>
       </main>
 
@@ -640,12 +630,14 @@ Notes for Counselor: Generated via Mentebloom Student Self-Tracking System.
                   >
                     CANCEL
                   </button>
-                  <button
+                  <Button6
                     type="submit"
-                    className="px-4 py-2 bg-[#c8f54e] text-[#1a1a1a] font-mono text-xs font-bold rounded-xl hover:bg-[#b5e43b] transition-colors cursor-pointer"
+                    hoverBgColor="#c8f54e"
+                    hoverTextColor="#1a1a1a"
+                    className="border-[#1a1a1a]"
                   >
                     CONFIRM BOOKING
-                  </button>
+                  </Button6>
                 </div>
               </form>
             </motion.div>
@@ -757,18 +749,22 @@ Notes for Counselor: Generated via Mentebloom Student Self-Tracking System.
                   READY TO SHARE WITH COUNSELOR
                 </span>
                 <div className="flex gap-2">
-                  <button
+                  <Button6
                     onClick={handleCopyReport}
-                    className="px-4 py-2 bg-[#1a1a1a] text-white font-mono text-xs font-bold rounded-xl hover:bg-[#333] transition-colors cursor-pointer"
+                    hoverBgColor="#c8f54e"
+                    hoverTextColor="#1a1a1a"
+                    className="border-[#1a1a1a]"
                   >
                     COPY REPORT TEXT
-                  </button>
-                  <button
+                  </Button6>
+                  <Button6
                     onClick={() => setShowReportModal(false)}
-                    className="px-4 py-2 bg-[#c8f54e] text-[#1a1a1a] font-mono text-xs font-bold rounded-xl hover:bg-[#b5e43b] transition-colors cursor-pointer"
+                    hoverBgColor="#1a1a1a"
+                    hoverTextColor="#ffffff"
+                    className="border-[#1a1a1a]"
                   >
                     CLOSE
-                  </button>
+                  </Button6>
                 </div>
               </div>
             </motion.div>

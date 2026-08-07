@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import ParticleText from "./ParticleText"
+import { TextEffect } from "@/components/ui/text-effect"
 import { ShinyButton } from "./ui/shiny-button"
 
 const VIDEO_URL =
@@ -36,37 +36,29 @@ export function HeroSection() {
           <span className="text-xl font-light tracking-widest text-white">mentebloom</span>
         </div>
 
-        <div className="flex w-full flex-1 flex-col items-center justify-center pb-24">
-          <div
-            className={`relative -top-12 w-full max-w-5xl h-[65vh] min-h-[500px] transition-all duration-1000 delay-[800ms] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}
-          >
-            <ParticleText
-              text={"Your Daily\nWellness\nJourney\nStarts Here"}
-              particleSize={2}
-              density={2}
-              color="#ffffff"
-              highlightColor="#e7e7ec"
-              scatter={180}
-              gatherDuration={1600}
-              stagger={420}
-              pointerRepel={40}
-              repelRadius={120}
-              idleDrift={0.7}
-              trigger="hover"
-              fontSize={110}
-              fontWeight={300}
-              fontFamily="Playfair Display, serif"
-              className="font-serif"
-              glow
-            />
-          </div>
+        <div className="flex w-full flex-1 flex-col items-center justify-center pb-12">
+          <div className="w-full max-w-5xl flex flex-col items-center justify-center text-center">
+            <div>
+              <TextEffect
+                per="line"
+                as="h1"
+                preset="slide"
+                className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.2] tracking-tight text-white select-none"
+                segmentWrapperClassName="overflow-hidden block"
+                trigger={isVisible}
+                delay={0.5}
+              >
+                {`Your Daily Wellness\nJourney Starts Here`}
+              </TextEffect>
+            </div>
 
-          <div
-            className={`relative top-10 mt-32 transition-all duration-1000 delay-[1200ms] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-          >
-            <ShinyButton>
-              Get Started
-            </ShinyButton>
+            <div
+              className={`mt-[15vh] sm:mt-[20vh] md:mt-[25vh] lg:mt-[30vh] transition-all duration-1000 delay-[1200ms] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+            >
+              <ShinyButton>
+                Get Started
+              </ShinyButton>
+            </div>
           </div>
         </div>
       </div>

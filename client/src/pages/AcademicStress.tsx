@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { TopNav } from "@/components/TopNav";
 import { AppFooter } from "@/components/AppFooter";
+import { FlowingMenu } from "@/components/ui/FlowingMenu";
+import { SpotlightTabs } from "@/components/ui/SpotlightTabs";
 import {
   useStore,
   calculateAcademicStressScore,
@@ -122,10 +124,10 @@ export default function AcademicStress() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-[10px] font-mono tracking-widest uppercase bg-[#c8f54e] text-[#1a1a1a] px-2 py-0.5 rounded-sm font-bold">
-                ACADEMIC INTELLIGENCE
+                ACADEMIC WORKLOAD
               </span>
               <span className="text-xs font-mono text-[#1a1a1a]/40">
-                REAL-TIME WORKLOAD ALGORITHM
+                WORKLOAD ASSESSMENT
               </span>
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-extrabold text-[#1a1a1a] tracking-tight">
@@ -455,8 +457,8 @@ export default function AcademicStress() {
                   </p>
                 </div>
                 <div className="mt-4 pt-3 border-t border-white/10 flex justify-between text-[10px] font-mono text-white/40 uppercase">
-                  <span>MENTEBLOOM ALGORITHM</span>
-                  <span>UPDATED REAL-TIME</span>
+                  <span>MENTEBLOOM</span>
+                  <span>UPDATED</span>
                 </div>
               </div>
             </div>
@@ -483,56 +485,41 @@ export default function AcademicStress() {
                 </button>
               </div>
 
-              {/* Status Filter Tabs */}
-              <div className="flex gap-1 p-1 bg-[#f5f3ef] rounded-lg mb-4">
-                {[
-                  { id: "all", label: `All (${academicTasks.length})` },
-                  { id: "pending", label: `Pending (${pendingTasks.length})` },
-                  { id: "completed", label: `Done (${completedTasks.length})` },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveStatusFilter(tab.id as any)}
-                    className={`flex-1 text-[11px] font-mono py-1.5 rounded-md transition-colors cursor-pointer ${
-                      activeStatusFilter === tab.id
-                        ? "bg-white text-[#1a1a1a] font-bold shadow-xs"
-                        : "text-[#1a1a1a]/50 hover:text-[#1a1a1a]"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+              {/* Status Filter Spotlight Tabs */}
+              <div className="mb-4">
+                <SpotlightTabs
+                  tabs={[
+                    { id: "all", label: "All", count: academicTasks.length },
+                    { id: "pending", label: "Pending", count: pendingTasks.length },
+                    { id: "completed", label: "Done", count: completedTasks.length },
+                  ]}
+                  activeId={activeStatusFilter}
+                  onChange={(id) => setActiveStatusFilter(id as any)}
+                  variant="dark"
+                />
               </div>
 
-              {/* Subject Filter Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-3 border-b border-[#e8e4df]/60 scrollbar-none">
-                <button
-                  onClick={() => setActiveSubjectFilter("all")}
-                  className={`text-[10px] font-mono px-2.5 py-1 rounded-md shrink-0 transition-colors cursor-pointer ${
-                    activeSubjectFilter === "all"
-                      ? "bg-[#1a1a1a] text-white font-bold"
-                      : "bg-[#f5f3ef] text-[#1a1a1a]/60 hover:bg-[#e8e4df]"
-                  }`}
-                >
-                  ALL SUBJECTS
-                </button>
-                {subjects.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => setActiveSubjectFilter(s.id)}
-                    className={`text-[10px] font-mono px-2.5 py-1 rounded-md shrink-0 transition-colors flex items-center gap-1.5 cursor-pointer ${
-                      activeSubjectFilter === s.id
-                        ? "bg-[#1a1a1a] text-white font-bold"
-                        : "bg-[#f5f3ef] text-[#1a1a1a]/60 hover:bg-[#e8e4df]"
-                    }`}
-                  >
-                    <span
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: s.color }}
-                    />
-                    {s.code}
-                  </button>
-                ))}
+              {/* Subject Selection FlowingMenu */}
+              <div className="mb-4">
+                <label className="block font-mono text-[10px] text-[#1a1a1a]/40 uppercase tracking-widest mb-2 font-bold">
+                  SUBJECT FILTER MENU
+                </label>
+                <FlowingMenu
+                  items={[
+                    { id: "all", text: "ALL SUBJECTS", subtext: "All active coursework tasks", color: "#1a1a1a" },
+                    ...subjects.map((s) => ({
+                      id: s.id,
+                      text: s.code,
+                      subtext: s.name,
+                      color: s.color,
+                    })),
+                  ]}
+                  activeId={activeSubjectFilter}
+                  onSelect={(id) => setActiveSubjectFilter(id)}
+                  speed={12}
+                  marqueeBgColor="#1a1a1a"
+                  marqueeTextColor="#c8f54e"
+                />
               </div>
 
               {/* Task Items List */}
