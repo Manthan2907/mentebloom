@@ -226,3 +226,27 @@
   animation: glow-left 3.5s linear infinite 2.625s;
 }
 
+@keyframes ani {
+  0% {
+    transform: translateX(0%) scale(1);
+  }
+  50% {
+    transform: translateX(-100%) scale(0.8);
+  }
+  100% {
+    transform: translateX(0%) scale(1);
+  }
+}
+
+@keyframes shine {
+  0% {
+    top: 100%;
+    left: -100%;
+  }
+  50%,
+  100% {
+    top: 0%;
+    left: 70%;
+  }
+}
+

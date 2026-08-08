@@ -1,31 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import MoltenMetal from "@/components/ui/MoltenMetal";
-
-const NOTES = [
-  {
-    text: (
-      <>
-        Good morning. <strong className="text-white">Wake by 6 AM</strong> has been your steadiest habit at <span className="text-[#c8f54e] font-mono">38%</span> this month — start there, and the rest tends to follow.
-      </>
-    ),
-  },
-  {
-    text: (
-      <>
-        Your consistency is building. <strong className="text-white">5 habits</strong> checked this week — you're on track for a new personal best.
-      </>
-    ),
-  },
-  {
-    text: (
-      <>
-        Remember: <span className="italic text-[#c8f54e]">small, repeated things</span> compound. You don't need to be perfect — you just need to keep showing up.
-      </>
-    ),
-  },
-];
+import { useStore, getDatesForCurrentWeek } from "@/lib/store";
 
 const variants = {
   enter: (direction: number) => ({
@@ -43,17 +20,62 @@ const variants = {
 };
 
 export function TodaysNote() {
+  const { habits } = useStore();
   const [activeIdx, setActiveIdx] = useState(0);
   const [direction, setDirection] = useState(0); // -1 for left, 1 for right
 
+  const currentWeekDates = useMemo(() => getDatesForCurrentWeek(), []);
+
+  const steadiestHabit = useMemo(() => {
+    if (!habits.length) return { name: "Wake by 6 AM", pct: 38 };
+    const best = habits.reduce((top, h) => {
+      const pTop = top.monthlyTarget ? top.monthlyCount / top.monthlyTarget : 0;
+      const pH = h.monthlyTarget ? h.monthlyCount / h.monthlyTarget : 0;
+      return pH > pTop ? h : top;
+    }, habits[0]);
+    const pct = Math.round((best.monthlyCount / (best.monthlyTarget || 30)) * 100);
+    return { name: best.name, pct };
+  }, [habits]);
+
+  const checkedThisWeek = useMemo(() => {
+    return habits.reduce((sum, h) => {
+      const count = currentWeekDates.filter((d) => h.history && h.history[d]).length;
+      return sum + count;
+    }, 0);
+  }, [habits, currentWeekDates]);
+
+  const notes = [
+    {
+      text: (
+        <>
+          Good morning. <strong className="text-white">{steadiestHabit.name}</strong> has been your steadiest habit at <span className="text-[#c8f54e] font-mono">{steadiestHabit.pct}%</span> this month — start there, and the rest tends to follow.
+        </>
+      ),
+    },
+    {
+      text: (
+        <>
+          Your consistency is building. <strong className="text-white">{checkedThisWeek} habits</strong> checked this week — you're on track for a new personal best.
+        </>
+      ),
+    },
+    {
+      text: (
+        <>
+          Remember: <span className="italic text-[#c8f54e]">small, repeated things</span> compound. You don't need to be perfect — you just need to keep showing up.
+        </>
+      ),
+    },
+  ];
+
   const nextNote = () => {
     setDirection(1);
-    setActiveIdx((prev) => (prev + 1) % NOTES.length);
+    setActiveIdx((prev) => (prev + 1) % notes.length);
   };
 
   const prevNote = () => {
     setDirection(-1);
-    setActiveIdx((prev) => (prev - 1 + NOTES.length) % NOTES.length);
+    setActiveIdx((prev) => (prev - 1 + notes.length) % notes.length);
   };
 
   return (
@@ -111,7 +133,7 @@ export function TodaysNote() {
             }}
             className="text-sm text-white/85 leading-relaxed font-sans w-full"
           >
-            {NOTES[activeIdx].text}
+            {notes[activeIdx].text}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -125,7 +147,7 @@ export function TodaysNote() {
           <ChevronLeft className="w-4 h-4" />
         </button>
         <div className="flex gap-1.5 ml-2">
-          {NOTES.map((_, i) => {
+          {notes.map((_, i) => {
             const isActive = i === activeIdx;
             return (
               <div

@@ -38,9 +38,18 @@ function getGateKey(): string {
 }
 
 export default function Home() {
-  const [gateDone, setGateDone] = useState<boolean>(false);
+  const [gateDone, setGateDone] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem("mentebloom_gate_completed") === "true";
+    } catch {
+      return false;
+    }
+  });
 
   const handleGateComplete = () => {
+    try {
+      sessionStorage.setItem("mentebloom_gate_completed", "true");
+    } catch {}
     setGateDone(true);
   };
 

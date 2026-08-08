@@ -26,7 +26,7 @@ This document contains a complete technical and feature summary of everything im
   - **Future Date Locking**: Checkboxes beyond the current date are disabled and rendered faded to prevent logging habits in the future.
 - **Hero Heading (`HeroSection.tsx`)**:
   - Displays **"Daily <dynamic_word>"** with static bold serif "Daily" and smoothly morphing italic accent words ("Practice", "Growing", "Learning", "Motivation", "Mindfulness", "Focus", "Reflection", "Progress") using Framer Motion `AnimatePresence`.
-- **Weekly Pulse Chart (`WeeklyPulse.tsx`)**:
+- **Weekly Pulse**:
   - Displays percentage of completed habits for each day of the current week.
   - Dynamic week-over-week performance comparison against the previous week.
   - Excludes future dates from skewing current week averages.
@@ -37,11 +37,12 @@ This document contains a complete technical and feature summary of everything im
 
 ---
 
-## 3. Mood Gate Overlay (`MoodGate.tsx`):
-  - Interactive daily mood check-in splash screen before revealing the main dashboard.
-  - Dark `#000000` background with dynamic WebGL `GradientWaves` shader background.
-  - **Direct Transition**: 2 phases (Mood Selection -> Factors -> Motivational Quote), directly transitioning to the main dashboard after the quote without showing a redundant final confirmation screen.
-  - **Session & Landing Page Navigation**: MoodGate completion state is stored in `sessionStorage`. Clicking "Get Started" on the Landing Page resets this state so the **MoodGate check-in screen always appears when entering from the Landing Page**. Navigating between tabs (Journal, Wellness, Academic, Meditation, Consultation) and clicking `DASHBOARD` retains your active session and stays on the main dashboard.
+## 3. Mood Gate Overlay (`MoodGate.tsx`)
+- **Interactive daily mood check-in splash screen before revealing the main dashboard.**
+- **Dark `#000000` background with dynamic WebGL `GradientWaves` shader background.**
+- **Direct Transition**: 2 phases (Mood Selection -> Factors -> Motivational Quote), directly transitioning to the main dashboard after the quote without showing a redundant final confirmation screen.
+- **Session & Landing Page Navigation**: MoodGate completion state is stored in `sessionStorage`. Clicking "Get Started" on the Landing Page resets this state so the **MoodGate check-in screen always appears when entering from the Landing Page**. Navigating between tabs (Journal, Wellness, Academic, Meditation, Consultation) and clicking `DASHBOARD` retains your active session and stays on the main dashboard.
+- **Heading**: Large, high-contrast white serif header (`How would you describe your mood?`).
 - **WebGL GradientWaves Background (`GradientWaves.tsx`)**:
   - Full-screen raymarching sine-plasma WebGL shader (`ogl` library) with subtle animated film grain and cursor parallax.
   - **Dynamic Mood Color Morphing**: Per-frame smooth RGB lerping (`+= 0.05 * (target - current)`) transitions wave colors smoothly as user hovers/selects different moods:

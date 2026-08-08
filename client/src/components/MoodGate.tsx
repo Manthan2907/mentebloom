@@ -11,6 +11,12 @@ import { useStore } from "@/lib/store";
 import type { Mood } from "@/lib/store";
 import { MOOD_COLORS } from "./MoodFaces";
 import GradientWaves from "./ui/GradientWaves";
+import BlurText from "./ui/BlurText";
+import { GlassShineCard } from "./ui/glass-shine-card";
+import OverlappingMoodStack from "./ui/OverlappingMoodStack";
+
+
+
 
 const MOOD_WAVE_COLORS: Record<Mood, { horizon: string, wave: string, crest: string }> = {
   sad: { horizon: "#050000", wave: "#4a1520", crest: "#a33d4e" },
@@ -102,18 +108,14 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
       setMood(selectedMood, selectedFactors);
       setQuote(getRandomQuote(selectedMood));
       setPhase("quote");
-      setTimeout(() => {
-        setPhase("done");
-        setTimeout(onComplete, 800);
-      }, 3500);
+      setTimeout(onComplete, 3500);
     }
   };
 
   const handleSkip = () => {
     setSelectedMood("okay");
     setMood("okay", []);
-    setPhase("done");
-    setTimeout(onComplete, 600);
+    onComplete();
   };
 
   const displayMood = currentMoodData || MOOD_SEGMENTS[2]; // default to neutral
@@ -193,159 +195,55 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
               className="flex flex-col items-center w-full max-w-lg px-6"
             >
               {/* Skip button */}
-              <div className="w-full flex justify-end mb-6">
+              <div className="w-full flex justify-end mb-4">
                 <button
                   onClick={handleSkip}
-                  className="text-sm font-sans text-[#1a1a1a]/30 hover:text-[#1a1a1a]/60 transition-colors"
+                  className="text-sm font-sans text-white/40 hover:text-white/80 transition-colors"
                 >
                   Skip
                 </button>
               </div>
 
-              {/* Title */}
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-[#1a1a1a] text-center mb-3 leading-tight">
-                How would you describe
-                <br />
-                your mood?
-              </h2>
-
-              {/* "I Feel..." text */}
-              <motion.p
-                key={`mood-text-${currentMood}`}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="text-xl font-sans mt-2 mb-3"
-                style={{ color: currentMoodData.color }}
-              >
-                {currentMoodData.text}
-              </motion.p>
-
-              {/* Large mood face */}
-              <motion.div
-                key={`mood-face-${currentMood}`}
-                initial={{ scale: 0.85, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="mb-4"
-              >
-                <LargeFace mood={currentMood} size={140} />
-              </motion.div>
-
-              {/* Gauge area — SVG background + clickable buttons */}
-              <div className="relative w-[380px] h-[220px] mb-4 overflow-hidden">
-                {/* SVG gauge background (decorative) */}
-                <svg
-                  viewBox="0 0 380 210"
-                  className="absolute inset-0 w-full h-full"
+              {/* Glass Plate 1: Text (Title + Mood status) */}
+              <GlassShineCard className="mb-4 px-6 py-5 text-center max-w-md w-full border-white/20 bg-white/10 backdrop-blur-xl shadow-2xl">
+                <BlurText
+                  text="How would you describe your mood?"
+                  delay={150}
+                  animateBy="words"
+                  direction="top"
+                  className="font-display text-2xl md:text-3xl font-bold text-white text-center mb-2 leading-tight justify-center"
+                />
+                <motion.p
+                  key={`mood-text-${currentMood}`}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-lg font-sans font-medium"
+                  style={{ color: currentMoodData.color }}
                 >
-                  {/* Semicircle arc segments */}
-                  {MOOD_SEGMENTS.map((segment, i) => {
-                    const startDeg = 180 - ((i + 1) * 36);
-                    const endDeg = 180 - (i * 36);
-                    const cx = 190;
-                    const cy = 200;
-                    const outerR = 180;
-                    const innerR = 70;
+                  {currentMoodData.text}
+                </motion.p>
+              </GlassShineCard>
 
-                    const isActive = currentMood === segment.value;
+              {/* Glass Plate 2: Large Hero Emoji Face */}
+              <GlassShineCard className="my-3 p-4 flex items-center justify-center rounded-full border-white/20 bg-white/10 backdrop-blur-xl shadow-2xl">
+                <motion.div
+                  key={`mood-face-${currentMood}`}
+                  initial={{ scale: 0.85, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <LargeFace mood={currentMood} size={120} />
+                </motion.div>
+              </GlassShineCard>
 
-                    const outerStartX = cx + outerR * Math.cos((startDeg * Math.PI) / 180);
-                    const outerStartY = cy - outerR * Math.sin((startDeg * Math.PI) / 180);
-                    const outerEndX = cx + outerR * Math.cos((endDeg * Math.PI) / 180);
-                    const outerEndY = cy - outerR * Math.sin((endDeg * Math.PI) / 180);
-
-                    const innerEndX = cx + innerR * Math.cos((endDeg * Math.PI) / 180);
-                    const innerEndY = cy - innerR * Math.sin((endDeg * Math.PI) / 180);
-                    const innerStartX = cx + innerR * Math.cos((startDeg * Math.PI) / 180);
-                    const innerStartY = cy - innerR * Math.sin((startDeg * Math.PI) / 180);
-
-                    const spanDeg = endDeg - startDeg;
-                    const largeArc = spanDeg > 180 ? 1 : 0;
-
-                    const d = [
-                      `M ${outerStartX} ${outerStartY}`,
-                      `A ${outerR} ${outerR} 0 ${largeArc} 1 ${outerEndX} ${outerEndY}`,
-                      `L ${innerEndX} ${innerEndY}`,
-                      `A ${innerR} ${innerR} 0 ${largeArc} 0 ${innerStartX} ${innerStartY}`,
-                      `Z`,
-                    ].join(" ");
-
-                    return (
-                      <path
-                        key={segment.value}
-                        d={d}
-                        fill={segment.color}
-                        opacity={isActive ? 1 : 0.5}
-                        style={{ transition: "opacity 0.25s" }}
-                      />
-                    );
-                  })}
-
-                  {/* Small face circles drawn as SVG (not foreignObject) */}
-                  {MOOD_SEGMENTS.map((segment, i) => {
-                    const midDeg = 180 - (i * 36) - 18;
-                    const faceR = 125;
-                    const fx = 190 + faceR * Math.cos((midDeg * Math.PI) / 180);
-                    const fy = 200 - faceR * Math.sin((midDeg * Math.PI) / 180);
-                    const isActive = currentMood === segment.value;
-
-                    return (
-                      <g key={`mini-${segment.value}`}>
-                        <circle cx={fx} cy={fy} r={20} fill={segment.color} opacity={isActive ? 1 : 0.7} style={{ transition: "opacity 0.25s" }} />
-                        <SmallFaceSvg cx={fx} cy={fy} mood={segment.value} />
-                      </g>
-                    );
-                  })}
-                </svg>
-
-                {/* Clickable invisible buttons positioned over each segment */}
-                {MOOD_SEGMENTS.map((segment) => {
-                  const midDeg = 180 - (segment.position * 36) - 18;
-                  const btnR = 125;
-                  // Position as percentage of container
-                  const pctX = ((190 + btnR * Math.cos((midDeg * Math.PI) / 180)) / 380) * 100;
-                  const pctY = ((200 - btnR * Math.sin((midDeg * Math.PI) / 180)) / 210) * 100;
-
-                  return (
-                    <button
-                      key={`btn-${segment.value}`}
-                      onClick={() => handleMoodClick(segment.value)}
-                      onMouseEnter={() => setHoveredMood(segment.value)}
-                      onMouseLeave={() => setHoveredMood(null)}
-                      className="absolute w-12 h-12 -ml-6 -mt-6 rounded-full cursor-pointer"
-                      style={{
-                        left: `${pctX}%`,
-                        top: `${pctY}%`,
-                        background: "transparent",
-                        border: "none",
-                        outline: "none",
-                        zIndex: 10,
-                      }}
-                      aria-label={`Select ${segment.label} mood`}
-                    />
-                  );
-                })}
-
-                {/* Needle indicator */}
-                <AnimatePresence>
-                  {currentMood && (
-                    <motion.div
-                      key="needle"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-14 pointer-events-none"
-                      style={{ zIndex: 5 }}
-                    >
-                      <svg viewBox="0 0 20 56" className="w-full h-full">
-                        <polygon points="10,0 0,56 20,56" fill="#1a1a1a" />
-                        <circle cx="10" cy="50" r="6" fill="#1a1a1a" />
-                      </svg>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              {/* Overlapping Mood Avatar Stack (matching reference image) */}
+              <OverlappingMoodStack
+                segments={MOOD_SEGMENTS}
+                currentMood={currentMood}
+                onSelectMood={(mood) => handleMoodClick(mood)}
+                onHoverMood={(mood) => setHoveredMood(mood)}
+              />
 
               {/* Continue button — only visible when mood is selected */}
               <AnimatePresence>
@@ -449,25 +347,6 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
               </motion.div>
             </motion.div>
           )}
-
-          {phase === "done" && (
-            <motion.div
-              key="done"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center"
-            >
-              <LargeFace mood={selectedMood || "okay"} size={110} />
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-xl font-display text-[#1a1a1a] mt-4"
-              >
-                {currentMoodData?.text}
-              </motion.p>
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
     </motion.div>
@@ -475,7 +354,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
 }
 
 /** Large face for the dial display */
-function LargeFace({ mood, size }: { mood: Mood; size: number }) {
+export function LargeFace({ mood, size }: { mood: Mood; size: number }) {
   const color = MOOD_COLORS[mood];
   const mouthPath = mood === "sad"
     ? "M34 80 C48 66, 72 66, 86 80"

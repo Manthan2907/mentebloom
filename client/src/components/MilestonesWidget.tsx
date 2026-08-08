@@ -3,8 +3,12 @@
  * Editorial Theme: Light white card
  */
 import { Download } from "lucide-react";
+import { useStore } from "@/lib/store";
 
 export function MilestonesWidget() {
+  const { currentStreak } = useStore();
+  const daysLeft = Math.max(0, 50 - currentStreak);
+
   return (
     <div className="bg-white rounded-xl border border-[#e8e4df] p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
@@ -20,7 +24,9 @@ export function MilestonesWidget() {
             <div className="w-1.5 h-1.5 rounded-full bg-[#c8f54e]" />
             <span className="text-sm text-[#1a1a1a]/70">50 Day Streak</span>
           </div>
-          <span className="text-[10px] font-mono text-[#1a1a1a]/30">23 DAYS LEFT</span>
+          <span className="text-[10px] font-mono text-[#1a1a1a]/30">
+            {daysLeft > 0 ? `${daysLeft} DAYS LEFT` : "COMPLETED!"}
+          </span>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

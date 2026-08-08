@@ -1,9 +1,31 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import { useStore } from "@/lib/store";
+
 import ColorBends from "@/components/ui/ColorBends";
+
+const DYNAMIC_WORDS = [
+  "Practice",
+  "Growing",
+  "Learning",
+  "Motivation",
+  "Mindfulness",
+  "Focus",
+  "Reflection",
+  "Progress"
+];
 
 export function HeroSection() {
   const { currentStreak, weeklyStreak, goalProgress, goalTarget } = useStore();
+  const [wordIndex, setWordIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % DYNAMIC_WORDS.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
 
   return (
     <div className="bg-white/75 backdrop-blur-md rounded-xl p-6 lg:p-8 shadow-sm border border-[#e8e4df] relative overflow-hidden">
@@ -66,8 +88,22 @@ export function HeroSection() {
               A quiet practice, kept honestly
             </span>
           </div>
-          <h1 className="font-display text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight">
-            Daily <span className="italic text-[#1a1a1a]/70">Practice</span>
+          <h1 className="font-display text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight flex items-center gap-2">
+            <span>Daily</span>
+            <span className="inline-block relative overflow-hidden py-1 h-[1.3em]">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={DYNAMIC_WORDS[wordIndex]}
+                  initial={{ y: 22, opacity: 0, filter: "blur(4px)" }}
+                  animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                  exit={{ y: -22, opacity: 0, filter: "blur(4px)" }}
+                  transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+                  className="italic text-[#1a1a1a]/70 inline-block font-display"
+                >
+                  {DYNAMIC_WORDS[wordIndex]}
+                </motion.span>
+              </AnimatePresence>
+            </span>
           </h1>
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-3">
             <span className="text-xs font-mono tracking-wider text-[#1a1a1a]/50 uppercase font-semibold">

@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { TextEffect } from "@/components/ui/text-effect"
-import { ShinyButton } from "./ui/shiny-button"
+import SpecularButton from "./ui/SpecularButton"
 
 const VIDEO_URL =
   "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/af7687fd-f2ad-4f2a-96f0-b56fa7d3769c-08wERpo5U1sktxs1vcRsJW9ueslNZv.mp4"
@@ -55,9 +55,26 @@ export function HeroSection() {
             <div
               className={`mt-[15vh] sm:mt-[20vh] md:mt-[25vh] lg:mt-[30vh] transition-all duration-1000 delay-[1200ms] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
             >
-              <ShinyButton>
+              <SpecularButton
+                size="lg"
+                radius={20}
+                tint="#ffffff"
+                tintOpacity={0.1}
+                blur={12}
+                textColor="#ffffff"
+                lineColor="#ffffff"
+                baseColor="#888888"
+                intensity={1.2}
+                shineSize={15}
+                shineFade={40}
+                thickness={1.5}
+                speed={0.35}
+                followMouse={true}
+                proximity={250}
+                autoAnimate={true}
+              >
                 Get Started
-              </ShinyButton>
+              </SpecularButton>
             </div>
           </div>
         </div>

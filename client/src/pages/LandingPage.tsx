@@ -37,6 +37,14 @@ function NavWrapper({ children, selector = "button" }: NavWrapperProps) {
       const target = e.target as HTMLElement;
       if (target.closest(selector)) {
         e.preventDefault();
+        try {
+          sessionStorage.removeItem("mentebloom_gate_completed");
+          localStorage.removeItem("mentebloom_gate_completed");
+          // Clear any dated gate keys
+          Object.keys(localStorage).forEach(k => {
+            if (k.startsWith("mentebloom_gate")) localStorage.removeItem(k);
+          });
+        } catch {}
         navigate("/app");
       }
     };
