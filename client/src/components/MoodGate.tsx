@@ -37,8 +37,8 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 overflow-y-auto bg-[#081019] p-3 text-[#f6f3eb] sm:p-6 lg:grid lg:place-items-center">
-      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1180px] flex-col overflow-y-auto rounded-[2rem] border border-white/15 bg-[#15202b]/95 shadow-[0_40px_120px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:min-h-[calc(100vh-3rem)] lg:min-h-[665px] lg:grid lg:grid-cols-[0.84fr_1.16fr] lg:overflow-hidden">
+    <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-[#081019] p-3 text-[#f6f3eb] sm:p-6 md:grid md:place-items-center">
+      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1180px] flex-col overflow-hidden rounded-[2rem] border border-white/15 bg-[#15202b]/95 shadow-[0_40px_120px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:min-h-[calc(100vh-3rem)] md:min-h-0 md:max-h-[calc(100vh-3rem)] md:grid md:grid-cols-[0.84fr_1.16fr]">
         <div aria-hidden="true" className="pointer-events-none absolute -left-20 top-1/3 size-64 rounded-full bg-[#c9d8b5]/15 blur-3xl" />
         <div aria-hidden="true" className="pointer-events-none absolute -right-20 bottom-0 size-72 rounded-full bg-[#b6d875]/10 blur-3xl" />
 
@@ -46,15 +46,15 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
           <div aria-hidden="true" className="pointer-events-none absolute -left-16 top-20 size-48 rounded-full bg-white/25 blur-3xl" />
           <div aria-hidden="true" className="pointer-events-none absolute bottom-8 right-6 size-40 rounded-full bg-[#8cb29a]/30 blur-2xl" />
           <div className="relative z-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"><Leaf className="size-4" /> mentebloom</div>
-          <div className="relative z-10 max-w-sm pb-4 sm:pb-8">
+          <div className="relative z-10 max-w-sm pb-28 sm:pb-32 md:pb-8">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#18212b]/55">A quiet arrival</p>
-            <h1 className="font-display text-4xl font-semibold leading-[0.95] sm:text-6xl">Before the day starts, check in with yourself.</h1>
+            <h1 className="font-display text-4xl font-semibold leading-[0.95] sm:text-5xl md:text-4xl lg:text-6xl">Before the day starts, check in with yourself.</h1>
             <p className="mt-5 max-w-xs text-sm leading-6 text-[#18212b]/70">Your answer shapes the small thought waiting for you on the dashboard.</p>
           </div>
-          <motion.img src="/meditating_character.png" alt="" aria-hidden="true" className="pointer-events-none absolute -bottom-10 right-[-1rem] w-52 opacity-75 mix-blend-multiply sm:w-72 lg:right-[-2rem] lg:w-[22rem]" initial={{ opacity: 0, y: 28 }} animate={{ opacity: 0.75, y: 0 }} transition={{ duration: 0.9, ease: "easeOut" }} />
+          <motion.img src="/meditating_character.png" alt="" aria-hidden="true" className="pointer-events-none absolute bottom-[-1.5rem] right-[-1rem] w-44 opacity-75 mix-blend-multiply sm:bottom-[-1rem] sm:w-56 md:w-52 lg:right-[-2rem] lg:w-[22rem]" initial={{ opacity: 0, y: 28 }} animate={{ opacity: 0.75, y: 0 }} transition={{ duration: 0.9, ease: "easeOut" }} />
         </section>
 
-        <section className="relative flex flex-1 flex-col p-6 sm:p-10 lg:p-14">
+        <section className="relative min-h-0 flex-1 overflow-y-auto p-6 sm:p-10 md:p-8 lg:p-12">
           <div className="mb-8 flex items-center justify-end">
             <button type="button" onClick={() => { setMood("okay", [], ""); onComplete(); }} className="text-xs text-white/45 underline-offset-4 transition hover:text-white hover:underline">Skip for now</button>
           </div>
@@ -68,11 +68,11 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
                 </motion.p>
               </AnimatePresence>
 
-              <motion.div key={`face-${mood ?? "none"}`} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 18 }} className="relative z-20 mt-8 grid size-28 place-items-center rounded-full border border-white/20 text-5xl shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:size-32" style={{ backgroundColor: mood ? `${selected.color}cc` : "rgba(255,255,255,0.08)" }}>
+              <motion.div key={`face-${mood ?? "none"}`} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 18 }} className="relative z-20 mt-5 grid size-24 place-items-center rounded-full border border-white/20 text-5xl shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:size-32" style={{ backgroundColor: mood ? `${selected.color}cc` : "rgba(255,255,255,0.08)" }}>
                 <span role="img" aria-label={mood ? selected.name : "Neutral"}>{mood ? selected.emoji : "😐"}</span>
               </motion.div>
 
-              <div className="relative mt-2 flex h-44 w-full max-w-md items-end justify-center sm:h-48">
+              <div className="relative mt-2 flex h-36 w-full max-w-md items-end justify-center sm:h-44 md:h-40 lg:h-44">
                 {MOODS.map((item, index) => {
                   const isSelected = mood === item.value;
                   const angle = (index - (MOODS.length - 1) / 2) * 17;
