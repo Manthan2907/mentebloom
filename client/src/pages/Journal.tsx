@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, Lock, Sparkles, Trash2, Edit3, X, Check,
+  Frown, Meh, Smile, Laugh, Heart, ArrowUpRight,
 } from "lucide-react";
 import { TopNav } from "@/components/TopNav";
 import { AppFooter } from "@/components/AppFooter";
@@ -13,11 +14,11 @@ import { useStore, getJournalPrompts } from "@/lib/store";
 import { toast } from "sonner";
 
 const MOOD_OPTIONS = [
-  { emoji: "😞", label: "sad", value: "sad" },
-  { emoji: "😐", label: "neutral", value: "low" },
-  { emoji: "🙂", label: "okay", value: "okay" },
-  { emoji: "😊", label: "good", value: "good" },
-  { emoji: "😄", label: "great", value: "great" },
+  { icon: Frown, label: "sad", value: "sad" },
+  { icon: Meh, label: "low", value: "low" },
+  { icon: Smile, label: "okay", value: "okay" },
+  { icon: Smile, label: "good", value: "good" },
+  { icon: Laugh, label: "great", value: "great" },
 ];
 
 const SENTIMENT_POSITIVE = ["happy", "great", "grateful", "joy", "love", "calm", "proud", "amazing", "wonderful", "excited"];
@@ -150,7 +151,7 @@ export default function Journal() {
 
             {/* Mood selector */}
             <motion.div variants={fade} custom={2} initial="hidden" animate="visible"
-              className="bg-white border border-[#e8e4df] rounded-xl px-4 py-3 shadow-sm"
+              className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl px-4 py-3 shadow-[0_12px_30px_rgba(26,26,26,0.06)]"
             >
               <p className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider mb-2">How are you feeling?</p>
               <div className="flex gap-3">
@@ -165,8 +166,8 @@ export default function Journal() {
                         : "border-[#f0ece7] hover:border-[#e8e4df]"
                     }`}
                   >
-                    <span className="text-xl leading-none" role="img" aria-label={m.label}>{m.emoji}</span>
-                    <span className="text-[9px] font-mono text-[#1a1a1a]/40">{m.label}</span>
+                    <m.icon className={`h-5 w-5 ${selectedMood === m.value ? "text-[#1a1a1a]" : "text-[#1a1a1a]/45"}`} aria-hidden="true" />
+                    <span className="text-[9px] font-mono text-[#1a1a1a]/45">{m.label}</span>
                   </button>
                 ))}
               </div>
@@ -174,7 +175,7 @@ export default function Journal() {
 
             {/* Text editor */}
             <motion.div variants={fade} custom={3} initial="hidden" animate="visible"
-              className="bg-white border border-[#e8e4df] rounded-xl p-4 shadow-sm"
+              className="bg-white/75 backdrop-blur-xl border border-white/80 rounded-2xl p-5 shadow-[0_18px_45px_rgba(26,26,26,0.07)]"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-mono text-[#1a1a1a]/35 uppercase tracking-wider">Entry</span>
@@ -214,7 +215,7 @@ export default function Journal() {
 
             {/* Quick prompts */}
             <motion.div variants={fade} custom={4} initial="hidden" animate="visible"
-              className="bg-white border border-[#e8e4df] rounded-xl p-4 shadow-sm"
+              className="bg-white/75 backdrop-blur-xl border border-white/80 rounded-2xl p-5 shadow-[0_18px_45px_rgba(26,26,26,0.07)]"
             >
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-3.5 h-3.5 text-[#c8f54e]" />
@@ -236,9 +237,9 @@ export default function Journal() {
 
           {/* Entry list */}
           <motion.div variants={fade} custom={5} initial="hidden" animate="visible"
-            className="bg-white border border-[#e8e4df] rounded-xl p-5 shadow-sm h-fit"
+            className="bg-[#1a1a1a] text-white rounded-2xl p-5 shadow-[0_18px_45px_rgba(26,26,26,0.14)] h-fit lg:sticky lg:top-24"
           >
-            <h3 className="font-display font-bold text-[#1a1a1a] mb-4">Recent Entries</h3>
+            <div className="mb-4 flex items-center justify-between"><div><p className="text-[10px] font-mono uppercase tracking-widest text-[#c8f54e]">Your archive</p><h3 className="mt-1 font-display font-bold text-white">Recent Entries</h3></div><span className="text-[10px] font-mono text-white/45">{recentEntries.length} saved</span></div>
             {recentEntries.length === 0 && (
               <p className="text-xs text-[#1a1a1a]/30 italic font-sans">No entries yet. Start writing above.</p>
             )}
@@ -253,12 +254,12 @@ export default function Journal() {
                     <motion.div
                       key={entry.id}
                       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }}
-                      className="border border-[#f0ece7] rounded-lg p-3 hover:border-[#e8e4df] transition-all"
+                      className="border border-white/10 bg-white/[0.04] rounded-xl p-3 hover:bg-white/[0.08] hover:border-white/20 transition-colors"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : entry.id)}>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[9px] font-mono text-[#1a1a1a]/35">{entry.date}</span>
+                            <span className="text-[9px] font-mono text-white/45">{entry.date}</span>
                             <span
                               className="text-[8px] font-mono px-1.5 py-0.5 rounded-full border"
                               style={{ color: eColor, borderColor: `${eColor}60`, backgroundColor: `${eColor}10` }}
@@ -266,7 +267,7 @@ export default function Journal() {
                               {entrySentiment}
                             </span>
                           </div>
-                          <p className="text-xs text-[#1a1a1a]/70 font-sans truncate">
+                          <p className="text-xs text-white/70 font-sans truncate">
                             {entry.content.slice(0, 60)}{entry.content.length > 60 ? "…" : ""}
                           </p>
                         </div>
