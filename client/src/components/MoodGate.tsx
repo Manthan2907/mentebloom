@@ -37,12 +37,12 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-[#081019] p-3 text-[#f6f3eb] sm:p-6 md:grid md:place-items-center">
-      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1180px] flex-col overflow-hidden rounded-[2rem] border border-white/15 bg-[#15202b]/95 shadow-[0_40px_120px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:min-h-[calc(100vh-3rem)] md:min-h-0 md:max-h-[calc(100vh-3rem)] md:grid md:grid-cols-[0.84fr_1.16fr]">
+    <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 h-dvh overflow-y-auto overscroll-contain bg-[#081019] p-3 text-[#f6f3eb] sm:p-6 md:grid md:place-items-center">
+      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1180px] flex-col overflow-hidden rounded-[2rem] border border-white/15 bg-[#15202b]/95 shadow-[0_40px_120px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:min-h-[calc(100vh-3rem)] md:h-[calc(100dvh-3rem)] md:min-h-0 md:grid md:grid-cols-[0.84fr_1.16fr]">
         <div aria-hidden="true" className="pointer-events-none absolute -left-20 top-1/3 size-64 rounded-full bg-[#c9d8b5]/15 blur-3xl" />
         <div aria-hidden="true" className="pointer-events-none absolute -right-20 bottom-0 size-72 rounded-full bg-[#b6d875]/10 blur-3xl" />
 
-        <section className="relative flex min-h-64 flex-col justify-between overflow-hidden bg-[#c9d8b5] p-6 text-[#18212b] sm:min-h-72 sm:p-9 lg:min-h-full lg:p-10">
+        <section className="relative min-h-64 min-w-0 flex flex-col justify-between overflow-hidden bg-[#c9d8b5] p-6 text-[#18212b] sm:min-h-72 sm:p-9 md:min-h-0 lg:p-10">
           <div aria-hidden="true" className="pointer-events-none absolute -left-16 top-20 size-48 rounded-full bg-white/25 blur-3xl" />
           <div aria-hidden="true" className="pointer-events-none absolute bottom-8 right-6 size-40 rounded-full bg-[#8cb29a]/30 blur-2xl" />
           <div className="relative z-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"><Leaf className="size-4" /> mentebloom</div>
@@ -54,7 +54,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
           <motion.img src="/meditating_character.png" alt="" aria-hidden="true" className="pointer-events-none absolute bottom-[-1.5rem] right-[-1rem] w-44 opacity-75 mix-blend-multiply sm:bottom-[-1rem] sm:w-56 md:w-52 lg:right-[-2rem] lg:w-[22rem]" initial={{ opacity: 0, y: 28 }} animate={{ opacity: 0.75, y: 0 }} transition={{ duration: 0.9, ease: "easeOut" }} />
         </section>
 
-        <section className="relative min-h-0 flex-1 overflow-y-auto p-6 sm:p-10 md:p-8 lg:p-12">
+        <section className="relative min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-6 sm:p-10 md:p-8 lg:p-12">
           <div className="mb-8 flex items-center justify-end">
             <button type="button" onClick={() => { setMood("okay", [], ""); onComplete(); }} className="text-xs text-white/45 underline-offset-4 transition hover:text-white hover:underline">Skip for now</button>
           </div>
@@ -86,7 +86,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
                       aria-label={item.name}
                       className="absolute bottom-0 left-1/2 origin-bottom outline-none"
                       style={{ width: 96, height, zIndex: isSelected ? 10 : index }}
-                      animate={{ rotate: angle, x: "-50%", y: isSelected ? -14 : 0 }}
+                      animate={{ rotate: angle, x: `calc(-50% + ${(index - 2) * 56}px)`, y: isSelected ? -14 : 0 }}
                       transition={{ type: "spring", stiffness: 260, damping: 20 }}
                       whileHover={{ y: -8 }}
                     >
