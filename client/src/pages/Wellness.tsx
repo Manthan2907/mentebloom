@@ -1,384 +1,80 @@
-/**
- * /app/wellness — Physical Wellness & Sleep Tracker
- * Sleep logging, exercise tracking, hydration, and correlation cards
- */
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-} from "recharts";
-import {
-  Moon, Activity, Droplet, Zap, Plus, Trash2,
-} from "lucide-react";
+import { Link } from "wouter";
+import { Activity, ArrowUpRight, Droplet, HeartHandshake, Moon, Plus, Trash2 } from "lucide-react";
 import { TopNav } from "@/components/TopNav";
 import { AppFooter } from "@/components/AppFooter";
-import { useStore, type ExerciseType, type ExerciseIntensity } from "@/lib/store";
+import { useStore, type ExerciseIntensity, type ExerciseType, type Mood } from "@/lib/store";
 import { toast } from "sonner";
-
-const fade = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.4, delay: i * 0.07 } }),
-};
 
 const EXERCISE_TYPES: ExerciseType[] = ["Running", "Yoga", "Gym", "Sports", "Walk", "Cycling", "Swimming", "Other"];
 const INTENSITIES: ExerciseIntensity[] = ["Low", "Medium", "High"];
+const MOODS: { value: Mood; label: string; note: string }[] = [
+  { value: "great", label: "Great", note: "Feeling energised" },
+  { value: "good", label: "Good", note: "Steady and okay" },
+  { value: "okay", label: "Okay", note: "Taking it gently" },
+  { value: "low", label: "Low", note: "A little heavy" },
+  { value: "sad", label: "Sad", note: "Could use support" },
+];
 
-function sleepColor(hours: number) {
-  if (hours < 6) return "#ef4444";
-  if (hours < 7) return "#eab308";
-  if (hours <= 9) return "#c8f54e";
-  return "#38bdf8";
-}
-
-function qualityLabel(q: number) {
-  return ["", "Poor", "Fair", "Good", "Great", "Excellent"][q] ?? "";
-}
+function qualityLabel(q: number) { return ["", "Poor", "Fair", "Good", "Great", "Excellent"][q] ?? ""; }
+function moodLabel(mood: Mood | null) { return MOODS.find((item) => item.value === mood)?.label ?? "Not checked in"; }
 
 export default function Wellness() {
-  const {
-    sleepEntries, addSleepEntry, removeSleepEntry,
-    exerciseSessions, addExerciseSession, removeExerciseSession,
-    hydration,
-  } = useStore();
-
-  // Sleep form
+  const { sleepEntries, addSleepEntry, removeSleepEntry, exerciseSessions, addExerciseSession, removeExerciseSession, hydration, todayMood, setMood } = useStore();
   const [sleepDate, setSleepDate] = useState(new Date().toISOString().split("T")[0]);
   const [sleepHours, setSleepHours] = useState(7.5);
   const [sleepQuality, setSleepQuality] = useState<1 | 2 | 3 | 4 | 5>(3);
   const [sleepNotes, setSleepNotes] = useState("");
-
-  // Exercise form
   const [exType, setExType] = useState<ExerciseType>("Walk");
   const [exDuration, setExDuration] = useState(30);
   const [exIntensity, setExIntensity] = useState<ExerciseIntensity>("Medium");
-
-  // Weekly sleep sparkline (last 7 entries)
   const last7Sleep = sleepEntries.slice(0, 7).reverse();
-
-  // Exercise bar chart by type
-  const exerciseByType = useMemo(() => {
-    const acc: Record<string, number> = {};
-    exerciseSessions.forEach((s) => {
-      acc[s.type] = (acc[s.type] || 0) + s.durationMinutes;
-    });
-    return Object.entries(acc).map(([name, minutes]) => ({ name, minutes }));
-  }, [exerciseSessions]);
-
-  // Summary stats
-  const avgSleep = useMemo(() => {
-    const valid = last7Sleep.filter((e) => e.hours > 0);
-    if (!valid.length) return 0;
-    return +(valid.reduce((a, b) => a + b.hours, 0) / valid.length).toFixed(1);
-  }, [last7Sleep]);
-
-  const totalExercise = useMemo(() =>
-    exerciseSessions.reduce((a, s) => a + s.durationMinutes, 0)
-  , [exerciseSessions]);
-
-  const hydrationGoal = 8;
-  const hydrationGlasses = Math.round((hydration.today / 1000) * 4); // 250ml per glass
-  const wellnessScore = Math.round(
-    Math.min(100,
-      (Math.min(avgSleep / 8, 1) * 33) +
-      (Math.min(totalExercise / 150, 1) * 33) +
-      (Math.min(hydrationGlasses / hydrationGoal, 1) * 34)
-    )
-  );
+  const avgSleep = useMemo(() => last7Sleep.length ? +(last7Sleep.reduce((total, entry) => total + entry.hours, 0) / last7Sleep.length).toFixed(1) : 0, [last7Sleep]);
+  const totalExercise = useMemo(() => exerciseSessions.reduce((total, session) => total + session.durationMinutes, 0), [exerciseSessions]);
+  const hydrationGlasses = Math.round((hydration.today / 1000) * 4);
+  const wellnessScore = Math.round(Math.min(100, Math.min(avgSleep / 8, 1) * 33 + Math.min(totalExercise / 150, 1) * 33 + Math.min(hydrationGlasses / 8, 1) * 34));
 
   const handleAddSleep = () => {
-    if (sleepHours <= 0) { toast.error("Enter valid sleep hours."); return; }
+    if (sleepHours <= 0) return toast.error("Enter valid sleep hours.");
     addSleepEntry({ date: sleepDate, hours: sleepHours, quality: sleepQuality, notes: sleepNotes });
-    setSleepNotes("");
-    toast.success("Sleep logged.");
+    setSleepNotes(""); toast.success("Sleep logged.");
   };
-
   const handleAddExercise = () => {
-    if (exDuration <= 0) { toast.error("Enter valid duration."); return; }
-    addExerciseSession({
-      date: new Date().toISOString().split("T")[0],
-      type: exType, durationMinutes: exDuration, intensity: exIntensity,
-    });
+    if (exDuration <= 0) return toast.error("Enter valid duration.");
+    addExerciseSession({ date: new Date().toISOString().split("T")[0], type: exType, durationMinutes: exDuration, intensity: exIntensity });
     toast.success("Session logged.");
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
+    <div className="min-h-screen bg-[#faf8f5] text-[#1a1a1a]">
       <TopNav />
-
-      <main className="container max-w-[1280px] mx-auto px-4 lg:px-8 py-8">
-        {/* Header */}
-        <motion.div variants={fade} custom={0} initial="hidden" animate="visible" className="mb-8">
-          <h1 className="font-display text-2xl font-bold text-[#1a1a1a]">Holistic Wellness Hub</h1>
-          <p className="text-sm text-[#1a1a1a]/50 font-mono mt-0.5">Sleep, exercise, hydration & correlation</p>
-        </motion.div>
-
-        {/* Summary Cards */}
-        <motion.div variants={fade} custom={1} initial="hidden" animate="visible"
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
-        >
-          {[
-            { label: "Avg Sleep", value: `${avgSleep}h`, icon: <Moon className="w-4 h-4" />, color: "#a78bfa" },
-            { label: "Total Exercise", value: `${totalExercise}min`, icon: <Activity className="w-4 h-4" />, color: "#c8f54e" },
-            { label: "Hydration", value: `${hydrationGlasses}/${hydrationGoal} glasses`, icon: <Droplet className="w-4 h-4" />, color: "#38bdf8", progress: hydrationGlasses / hydrationGoal },
-            { label: "Wellness Score", value: `${wellnessScore}`, icon: <Zap className="w-4 h-4" />, color: "#f97316" },
-          ].map((card, i) => (
-            <motion.div key={i} variants={fade} custom={i + 2} initial="hidden" animate="visible"
-              className="bg-white border border-[#e8e4df] rounded-xl p-4 shadow-sm"
-            >
-              <div className="flex items-center gap-2 mb-2" style={{ color: card.color }}>
-                {card.icon}
-                <span className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider">{card.label}</span>
-              </div>
-              <p className="font-display text-xl font-bold text-[#1a1a1a]">{card.value}</p>
-              {"progress" in card && (
-                <div className="mt-2 h-1.5 bg-[#f0ece7] rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{ width: `${Math.min(card.progress! * 100, 100)}%`, backgroundColor: card.color }}
-                  />
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Sleep Tracker */}
-          <motion.div variants={fade} custom={6} initial="hidden" animate="visible"
-            className="bg-white border border-[#e8e4df] rounded-xl p-6 shadow-sm"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <Moon className="w-4 h-4 text-[#a78bfa]" />
-              <h3 className="font-display font-bold text-[#1a1a1a]">Sleep Tracker</h3>
-            </div>
-
-            {/* Sparkline */}
-            <div className="flex items-end gap-1.5 h-12 mb-4">
-              {last7Sleep.map((entry, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-0.5 group relative">
-                  <div
-                    className="w-full rounded-sm transition-all"
-                    style={{
-                      height: `${(entry.hours / 12) * 100}%`,
-                      backgroundColor: sleepColor(entry.hours),
-                      minHeight: 4,
-                    }}
-                  />
-                  <span className="text-[9px] font-mono text-[#1a1a1a]/30 hidden group-hover:block absolute -top-4 bg-white border border-[#e8e4df] px-1 rounded z-10 whitespace-nowrap">
-                    {entry.hours}h
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-3 text-[10px] font-mono text-[#1a1a1a]/40 mb-4">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#ef4444]" /> {`<6h`}</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#eab308]" /> 6–7h</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#c8f54e]" /> 7–9h</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-[#38bdf8]" /> 9+h</span>
-            </div>
-
-            {/* Form */}
-            <div className="space-y-3 border-t border-[#f0ece7] pt-4">
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider mb-1 block">Date</label>
-                  <input
-                    type="date" value={sleepDate} onChange={(e) => setSleepDate(e.target.value)}
-                    className="w-full text-xs border border-[#e8e4df] rounded-lg px-3 py-2 bg-[#faf8f5] font-mono text-[#1a1a1a] focus:outline-none focus:border-[#c8f54e]"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider mb-1 block">Hours</label>
-                  <input
-                    type="number" min={0} max={12} step={0.5} value={sleepHours}
-                    onChange={(e) => setSleepHours(+e.target.value)}
-                    className="w-full text-xs border border-[#e8e4df] rounded-lg px-3 py-2 bg-[#faf8f5] font-mono text-[#1a1a1a] focus:outline-none focus:border-[#c8f54e]"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider mb-1 block">
-                  Quality — {qualityLabel(sleepQuality)}
-                </label>
-                <div className="flex gap-2">
-                  {([1, 2, 3, 4, 5] as const).map((q) => (
-                    <button
-                      key={q} onClick={() => setSleepQuality(q)}
-                      className={`flex-1 py-1.5 text-xs font-mono rounded-md transition-all border ${
-                        sleepQuality === q
-                          ? "bg-[#c8f54e] border-[#c8f54e] text-[#1a1a1a] font-semibold"
-                          : "border-[#e8e4df] text-[#1a1a1a]/40 hover:border-[#c8f54e]"
-                      }`}
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <textarea
-                placeholder="Sleep notes (optional)…"
-                value={sleepNotes} onChange={(e) => setSleepNotes(e.target.value)}
-                rows={2}
-                className="w-full text-xs border border-[#e8e4df] rounded-lg px-3 py-2 bg-[#faf8f5] font-sans text-[#1a1a1a] resize-none focus:outline-none focus:border-[#c8f54e] placeholder:text-[#1a1a1a]/25"
-              />
-              <button
-                onClick={handleAddSleep}
-                className="flex items-center gap-2 px-4 py-2 bg-[#c8f54e] text-[#1a1a1a] text-xs font-semibold font-mono rounded-lg hover:bg-[#b8e840] transition-colors"
-              >
-                <Plus className="w-3 h-3" /> Log Sleep
-              </button>
-            </div>
-
-            {/* Recent entries */}
-            <div className="mt-4 space-y-2 max-h-40 overflow-y-auto">
-              {sleepEntries.slice(0, 5).map((e) => (
-                <div key={e.id} className="flex items-center justify-between text-xs text-[#1a1a1a]/60 font-mono">
-                  <span>{e.date}</span>
-                  <span style={{ color: sleepColor(e.hours) }}>{e.hours}h</span>
-                  <span>{qualityLabel(e.quality)}</span>
-                  <button onClick={() => removeSleepEntry(e.id)} className="text-[#1a1a1a]/25 hover:text-[#ef4444] transition-colors">
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Exercise Logger */}
-          <motion.div variants={fade} custom={7} initial="hidden" animate="visible"
-            className="bg-white border border-[#e8e4df] rounded-xl p-6 shadow-sm"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <Activity className="w-4 h-4 text-[#c8f54e]" />
-              <h3 className="font-display font-bold text-[#1a1a1a]">Exercise Logger</h3>
-            </div>
-
-            {/* Bar chart */}
-            {exerciseByType.length > 0 && (
-              <div className="mb-4">
-                <ResponsiveContainer width="100%" height={120}>
-                  <BarChart data={exerciseByType} layout="vertical" barSize={10}>
-                    <XAxis type="number" tick={{ fontSize: 9, fill: "#1a1a1a", opacity: 0.35 }} tickLine={false} axisLine={false} />
-                    <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: "#1a1a1a", opacity: 0.5, fontFamily: "JetBrains Mono" }} tickLine={false} axisLine={false} width={58} />
-                    <Tooltip
-                      contentStyle={{ background: "#fff", border: "1px solid #e8e4df", borderRadius: 8, fontSize: 11 }}
-                      formatter={(v: number) => [`${v} min`, "Total"]}
-                    />
-                    <Bar dataKey="minutes" fill="#c8f54e" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-
-            {/* Form */}
-            <div className="space-y-3 border-t border-[#f0ece7] pt-4">
-              <div>
-                <label className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider mb-1 block">Activity</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {EXERCISE_TYPES.map((t) => (
-                    <button
-                      key={t} onClick={() => setExType(t)}
-                      className={`px-2.5 py-1 text-[10px] font-mono rounded-md border transition-all ${
-                        exType === t
-                          ? "bg-[#c8f54e] border-[#c8f54e] text-[#1a1a1a] font-semibold"
-                          : "border-[#e8e4df] text-[#1a1a1a]/50 hover:border-[#c8f54e]"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider mb-1 block">Duration (min)</label>
-                  <input
-                    type="number" min={1} max={300} value={exDuration}
-                    onChange={(e) => setExDuration(+e.target.value)}
-                    className="w-full text-xs border border-[#e8e4df] rounded-lg px-3 py-2 bg-[#faf8f5] font-mono text-[#1a1a1a] focus:outline-none focus:border-[#c8f54e]"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider mb-1 block">Intensity</label>
-                  <div className="flex gap-1">
-                    {INTENSITIES.map((i) => (
-                      <button key={i} onClick={() => setExIntensity(i)}
-                        className={`flex-1 py-2 text-[10px] font-mono rounded-md border transition-all ${
-                          exIntensity === i
-                            ? "bg-[#c8f54e] border-[#c8f54e] text-[#1a1a1a] font-semibold"
-                            : "border-[#e8e4df] text-[#1a1a1a]/50 hover:border-[#c8f54e]"
-                        }`}
-                      >
-                        {i}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={handleAddExercise}
-                className="flex items-center gap-2 px-4 py-2 bg-[#c8f54e] text-[#1a1a1a] text-xs font-semibold font-mono rounded-lg hover:bg-[#b8e840] transition-colors"
-              >
-                <Plus className="w-3 h-3" /> Log Session
-              </button>
-            </div>
-
-            {/* Recent sessions */}
-            <div className="mt-4 space-y-2 max-h-36 overflow-y-auto">
-              {exerciseSessions.slice(0, 5).map((s) => (
-                <div key={s.id} className="flex items-center justify-between text-xs text-[#1a1a1a]/60 font-mono">
-                  <span className="text-[#c8f54e] font-semibold">{s.type}</span>
-                  <span>{s.durationMinutes}min</span>
-                  <span className="text-[#1a1a1a]/35">{s.intensity}</span>
-                  <button onClick={() => removeExerciseSession(s.id)} className="text-[#1a1a1a]/25 hover:text-[#ef4444] transition-colors">
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Correlation Cards */}
-        <motion.div variants={fade} custom={8} initial="hidden" animate="visible">
-          <h3 className="font-display font-bold text-[#1a1a1a] mb-3">Wellness Correlations</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[
-              {
-                title: "Sleep Quality ↔ Mood",
-                value: `${Math.round(Math.min(avgSleep / 8, 1) * 100)}% alignment`,
-                description: avgSleep >= 7 ? "Good sleep is supporting your mood." : "More sleep may improve your daily mood.",
-                color: "#a78bfa",
-                icon: <Moon className="w-4 h-4" />,
-              },
-              {
-                title: "Exercise ↔ Stress Reduction",
-                value: totalExercise > 0 ? `${Math.min(totalExercise, 150)} / 150 min` : "No sessions yet",
-                description: totalExercise >= 150 ? "You hit the weekly activity goal." : `${150 - totalExercise} min left to reach weekly goal.`,
-                color: "#c8f54e",
-                icon: <Activity className="w-4 h-4" />,
-              },
-              {
-                title: "Hydration ↔ Energy",
-                value: `${hydrationGlasses} / ${hydrationGoal} glasses`,
-                description: hydrationGlasses >= hydrationGoal ? "Hydration goal met. Keep it up." : `Drink ${hydrationGoal - hydrationGlasses} more glasses today.`,
-                color: "#38bdf8",
-                icon: <Droplet className="w-4 h-4" />,
-              },
-            ].map((card, i) => (
-              <div key={i} className="bg-white border border-[#e8e4df] rounded-xl p-5 shadow-sm">
-                <div className="flex items-center gap-2 mb-2" style={{ color: card.color }}>
-                  {card.icon}
-                  <span className="text-[10px] font-mono text-[#1a1a1a]/40 uppercase tracking-wider">{card.title}</span>
-                </div>
-                <p className="font-display font-bold text-[#1a1a1a]">{card.value}</p>
-                <p className="text-xs text-[#1a1a1a]/50 font-sans mt-1">{card.description}</p>
-              </div>
-            ))}
+      <main className="container mx-auto max-w-[1280px] px-4 py-8 lg:px-8">
+        <header className="mb-8 flex flex-col justify-between gap-5 border-b border-[#e8e4df] pb-7 md:flex-row md:items-end">
+          <div>
+            <div className="mb-2 flex items-center gap-2"><span className="rounded-sm bg-[#c8f54e] px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest">Personal wellbeing</span><span className="font-mono text-xs text-[#1a1a1a]/40">A daily check-in</span></div>
+            <h1 className="font-display text-3xl font-extrabold tracking-tight md:text-4xl">How are you feeling today?</h1>
+            <p className="mt-1 max-w-xl text-sm leading-relaxed text-[#1a1a1a]/60">A quieter place to notice your mood, care for your body, and find support when you need it.</p>
           </div>
-        </motion.div>
-      </main>
-      <AppFooter />
+          <Link href="/app" className="flex items-center gap-2 self-start rounded-xl bg-[#1a1a1a] px-4 py-2.5 font-mono text-xs font-semibold text-white transition-colors hover:bg-[#333] md:self-auto">Back to dashboard <ArrowUpRight className="h-4 w-4 text-[#c8f54e]" /></Link>
+        </header>
+
+        <section className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+          <div className="rounded-2xl border border-[#e8e4df] bg-white p-6 shadow-sm">
+            <div className="mb-5 flex items-start justify-between gap-4"><div><p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-[#1a1a1a]/40">Today&apos;s check-in</p><h2 className="font-display text-2xl font-bold">{todayMood ? `You&apos;re feeling ${moodLabel(todayMood).toLowerCase()}.` : "Start with one word."}</h2></div><HeartHandshake className="h-5 w-5 text-[#1a1a1a]/40" /></div>
+            <div className="grid grid-cols-5 gap-2">{MOODS.map((item) => <button key={item.value} onClick={() => { setMood(item.value, []); toast.success(`Mood saved: ${item.label}.`); }} aria-pressed={todayMood === item.value} className={`rounded-xl border px-2 py-3 text-center transition-colors ${todayMood === item.value ? "border-[#c8f54e] bg-[#c8f54e]" : "border-[#e8e4df] bg-[#faf8f5] hover:border-[#1a1a1a]/30"}`}><span className="block font-display text-sm font-bold">{item.label}</span><span className="mt-1 hidden text-[10px] text-[#1a1a1a]/50 sm:block">{item.note}</span></button>)}</div>
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#f0ece7] pt-4"><p className="text-xs text-[#1a1a1a]/50">Your check-in stays private and helps you notice patterns.</p><Link href="/app/journal" className="font-mono text-xs font-bold underline decoration-[#c8f54e] decoration-2 underline-offset-4">Reflect in journal <ArrowUpRight className="ml-1 inline h-3 w-3" /></Link></div>
+          </div>
+          <div className="rounded-2xl bg-[#1a1a1a] p-6 text-white"><p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[#c8f54e]">Your wellbeing snapshot</p><div className="flex items-end gap-3"><span className="font-display text-6xl font-black leading-none">{wellnessScore}</span><span className="pb-1 font-mono text-xs text-white/60">/ 100 today</span></div><p className="mt-4 text-sm leading-relaxed text-white/65">A gentle view of sleep, movement, and hydration — not a grade.</p><div className="mt-6 grid grid-cols-3 gap-3 border-t border-white/15 pt-4 text-xs"><span><strong className="block font-display text-lg text-white">{avgSleep}h</strong>sleep</span><span><strong className="block font-display text-lg text-white">{totalExercise}m</strong>movement</span><span><strong className="block font-display text-lg text-white">{hydrationGlasses}/8</strong>water</span></div></div>
+        </section>
+
+        <section className="mb-8 flex flex-col justify-between gap-4 border-y border-[#e8e4df] py-5 md:flex-row md:items-center"><div><p className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#1a1a1a]/40">Need a person, not another metric?</p><h2 className="mt-1 font-display text-xl font-bold">Talk with a counsellor</h2><p className="mt-1 text-sm text-[#1a1a1a]/55">Get a little more support when things feel difficult to carry alone.</p></div><Link href="/app/consultation" className="flex items-center gap-2 self-start rounded-xl border border-[#1a1a1a] px-4 py-2.5 font-mono text-xs font-bold transition-colors hover:bg-[#1a1a1a] hover:text-white">Explore support <ArrowUpRight className="h-4 w-4" /></Link></section>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-[#e8e4df] bg-white p-6 shadow-sm"><div className="mb-4 flex items-center gap-2"><Moon className="h-4 w-4 text-[#7c5cff]" /><h2 className="font-display text-lg font-bold">Sleep tracker</h2></div><div className="mb-5 flex h-12 items-end gap-1.5">{last7Sleep.map((entry) => <div key={entry.id} title={`${entry.hours} hours`} className="flex-1 rounded-sm bg-[#c8f54e]" style={{ height: `${Math.max(8, (entry.hours / 12) * 100)}%` }} />)}</div><div className="grid grid-cols-2 gap-3 border-t border-[#f0ece7] pt-4"><input type="date" value={sleepDate} onChange={(e) => setSleepDate(e.target.value)} className="rounded-lg border border-[#e8e4df] bg-[#faf8f5] px-3 py-2 text-xs" /><input type="number" min={0} max={12} step={0.5} value={sleepHours} onChange={(e) => setSleepHours(+e.target.value)} className="rounded-lg border border-[#e8e4df] bg-[#faf8f5] px-3 py-2 text-xs" /></div><div className="mt-3 flex gap-2">{([1,2,3,4,5] as const).map((q) => <button key={q} onClick={() => setSleepQuality(q)} className={`flex-1 rounded-md border py-1.5 text-xs ${sleepQuality === q ? "border-[#c8f54e] bg-[#c8f54e]" : "border-[#e8e4df]"}`}>{q}</button>)}</div><textarea rows={2} value={sleepNotes} onChange={(e) => setSleepNotes(e.target.value)} placeholder="A note about last night (optional)" className="mt-3 w-full resize-none rounded-lg border border-[#e8e4df] bg-[#faf8f5] px-3 py-2 text-xs" /><button onClick={handleAddSleep} className="mt-3 flex items-center gap-2 rounded-lg bg-[#c8f54e] px-4 py-2 font-mono text-xs font-semibold"><Plus className="h-3 w-3" /> Log sleep</button><div className="mt-4 flex flex-col gap-2">{sleepEntries.slice(0, 4).map((entry) => <div key={entry.id} className="flex items-center justify-between font-mono text-xs text-[#1a1a1a]/55"><span>{entry.date}</span><span>{entry.hours}h · {qualityLabel(entry.quality)}</span><button onClick={() => removeSleepEntry(entry.id)} aria-label={`Remove sleep entry from ${entry.date}`}><Trash2 className="h-3 w-3" /></button></div>)}</div></motion.section>
+          <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="rounded-2xl border border-[#e8e4df] bg-white p-6 shadow-sm"><div className="mb-5 flex items-center gap-2"><Activity className="h-4 w-4 text-[#1a1a1a]" /><h2 className="font-display text-lg font-bold">Movement today</h2></div><div className="flex flex-wrap gap-2">{EXERCISE_TYPES.map((type) => <button key={type} onClick={() => setExType(type)} className={`rounded-md border px-2.5 py-1.5 font-mono text-[10px] ${exType === type ? "border-[#c8f54e] bg-[#c8f54e]" : "border-[#e8e4df]"}`}>{type}</button>)}</div><div className="mt-5 grid grid-cols-2 gap-3"><label className="font-mono text-[10px] text-[#1a1a1a]/45">MINUTES<input type="number" min={1} value={exDuration} onChange={(e) => setExDuration(+e.target.value)} className="mt-1 w-full rounded-lg border border-[#e8e4df] bg-[#faf8f5] px-3 py-2 text-xs text-[#1a1a1a]" /></label><label className="font-mono text-[10px] text-[#1a1a1a]/45">INTENSITY<select value={exIntensity} onChange={(e) => setExIntensity(e.target.value as ExerciseIntensity)} className="mt-1 w-full rounded-lg border border-[#e8e4df] bg-[#faf8f5] px-3 py-2 text-xs text-[#1a1a1a]">{INTENSITIES.map((intensity) => <option key={intensity}>{intensity}</option>)}</select></label></div><button onClick={handleAddExercise} className="mt-5 flex items-center gap-2 rounded-lg bg-[#c8f54e] px-4 py-2 font-mono text-xs font-semibold"><Plus className="h-3 w-3" /> Log movement</button><div className="mt-6 border-t border-[#f0ece7] pt-4"><div className="mb-3 flex items-center gap-2"><Droplet className="h-4 w-4 text-[#38bdf8]" /><span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#1a1a1a]/45">Hydration</span></div><p className="font-display text-2xl font-bold">{hydrationGlasses} <span className="font-sans text-sm font-normal text-[#1a1a1a]/45">of 8 glasses</span></p><div className="mt-3 h-2 rounded-full bg-[#f0ece7]"><div className="h-full rounded-full bg-[#38bdf8]" style={{ width: `${Math.min(100, hydrationGlasses / 8 * 100)}%` }} /></div></div><div className="mt-5 flex flex-col gap-2">{exerciseSessions.slice(0, 4).map((session) => <div key={session.id} className="flex items-center justify-between font-mono text-xs text-[#1a1a1a]/55"><span className="font-semibold text-[#1a1a1a]">{session.type}</span><span>{session.durationMinutes}m · {session.intensity}</span><button onClick={() => removeExerciseSession(session.id)} aria-label={`Remove ${session.type} session`}><Trash2 className="h-3 w-3" /></button></div>)}</div></motion.section>
+        </div>
+      </main><AppFooter />
     </div>
   );
 }
