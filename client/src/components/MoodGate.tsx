@@ -45,10 +45,10 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
     <motion.main
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-50 overflow-y-auto bg-[#101720] px-4 py-5 text-[#f3f1e8] sm:px-8 sm:py-8"
+      className="fixed inset-0 z-50 overflow-y-auto bg-[#0d141c] px-3 py-3 text-[#f3f1e8] sm:px-6 sm:py-6 lg:grid lg:place-items-center"
     >
-      <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-6xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#18212b] shadow-2xl sm:min-h-[calc(100vh-4rem)] lg:grid lg:grid-cols-[0.84fr_1.16fr]">
-        <section className="relative flex min-h-56 flex-col justify-between overflow-hidden bg-[#c9d8b5] p-6 text-[#18212b] sm:p-9 lg:min-h-full">
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1150px] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#18212b] shadow-[0_30px_90px_rgba(0,0,0,0.35)] sm:min-h-[calc(100vh-3rem)] lg:min-h-[665px] lg:grid lg:grid-cols-[0.88fr_1.12fr]">
+        <section className="relative flex min-h-64 flex-col justify-between overflow-hidden bg-[#c9d8b5] p-6 text-[#18212b] sm:min-h-72 sm:p-9 lg:min-h-full lg:p-10">
           <div className="relative z-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"><Leaf className="size-4" /> mentebloom</div>
           <div className="relative z-10 max-w-sm pb-4 sm:pb-8">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#18212b]/55">A quiet arrival</p>
@@ -67,7 +67,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
           <AnimatePresence mode="wait">
             {step === "mood" && (
               <motion.div key="mood" initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }}>
-                <h2 className="max-w-lg font-display text-3xl leading-tight sm:text-5xl">What is the truest word for today?</h2>
+                <h2 className="max-w-xl font-display text-[2.65rem] leading-[0.98] tracking-[-0.035em] sm:text-6xl lg:text-[4.1rem]">What is the truest word for today?</h2>
                 <div className="relative mt-8">
                   <motion.div
                     aria-hidden="true"
@@ -79,7 +79,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
                   </motion.div>
                   <div className="grid gap-2 sm:grid-cols-5">
                   {MOODS.map((item) => (
-                    <motion.button type="button" key={item.value} whileTap={{ scale: 0.96 }} onClick={() => setMoodChoice(item.value)} aria-pressed={mood === item.value} className={`group relative min-h-32 overflow-hidden rounded-2xl border p-3 text-left transition-colors sm:min-h-36 ${mood === item.value ? "border-white/35 bg-white/[0.16] text-white shadow-[0_16px_45px_rgba(0,0,0,0.24)] backdrop-blur-xl" : "border-white/10 bg-white/[0.03] text-white hover:border-white/30 hover:bg-white/[0.07]"}`}>
+                    <motion.button type="button" key={item.value} whileTap={{ scale: 0.96 }} onClick={() => setMoodChoice(item.value)} aria-pressed={mood === item.value} className={`group relative min-h-36 overflow-hidden rounded-[1.15rem] border p-3 text-left transition-colors sm:min-h-40 ${mood === item.value ? "border-white/45 bg-white/[0.18] text-white shadow-[0_18px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl" : "border-white/10 bg-white/[0.035] text-white hover:border-white/30 hover:bg-white/[0.08]"}`}>
                       <motion.span animate={mood === item.value ? { scale: [1, 1.45, 1], opacity: [1, 0.45, 1] } : { scale: 1, opacity: 1 }} transition={{ duration: 0.7, ease: "easeOut" }} className="absolute -right-5 -top-5 size-20 rounded-full blur-xl" style={{ backgroundColor: item.color }} />
                       <motion.span animate={mood === item.value ? { scale: [1, 1.22, 1], rotate: [0, -8, 8, 0] } : { scale: 1, rotate: 0 }} transition={{ duration: 0.55 }} className={`relative z-10 mb-6 grid size-14 place-items-center rounded-full text-3xl leading-none transition-all ${mood === item.value ? "border border-white/35 bg-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_12px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl" : "bg-white/[0.04]"}`} role="img" aria-label={item.name}>{item.emoji}</motion.span>
                       <span className="relative z-10 block text-sm font-semibold">{item.name}</span><span className={`relative z-10 mt-1 block text-[11px] leading-4 ${mood === item.value ? "text-[#18212b]/60" : "text-white/40"}`}>{item.detail}</span>
