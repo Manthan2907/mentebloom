@@ -68,16 +68,29 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
             {step === "mood" && (
               <motion.div key="mood" initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }}>
                 <h2 className="max-w-lg font-display text-3xl leading-tight sm:text-5xl">What is the truest word for today?</h2>
-                <div className="mt-8 grid gap-2 sm:grid-cols-5">
+                <div className="relative mt-8">
+                  <motion.div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -top-4 hidden h-4 w-5 -translate-x-1/2 sm:block"
+                    animate={{ left: mood ? `${((MOODS.findIndex((item) => item.value === mood) + 0.5) / MOODS.length) * 100}%` : "0%", opacity: mood ? 1 : 0 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                  >
+                    <div className="mx-auto h-0 w-0 border-x-[10px] border-t-[10px] border-x-transparent border-t-[#c9d8b5] drop-shadow-[0_0_12px_rgba(201,216,181,0.65)]" />
+                  </motion.div>
+                  <div className="grid gap-2 sm:grid-cols-5">
                   {MOODS.map((item) => (
-                    <motion.button type="button" key={item.value} whileTap={{ scale: 0.96 }} onClick={() => { setMoodChoice(item.value); setStep("context"); }} className={`group relative min-h-32 overflow-hidden rounded-2xl border p-3 text-left transition-colors sm:min-h-36 ${mood === item.value ? "border-[#c9d8b5] bg-[#c9d8b5] text-[#18212b]" : "border-white/10 bg-white/[0.03] text-white hover:border-white/30 hover:bg-white/[0.07]"}`}>
+                    <motion.button type="button" key={item.value} whileTap={{ scale: 0.96 }} onClick={() => setMoodChoice(item.value)} aria-pressed={mood === item.value} className={`group relative min-h-32 overflow-hidden rounded-2xl border p-3 text-left transition-colors sm:min-h-36 ${mood === item.value ? "border-white/35 bg-white/[0.16] text-white shadow-[0_16px_45px_rgba(0,0,0,0.24)] backdrop-blur-xl" : "border-white/10 bg-white/[0.03] text-white hover:border-white/30 hover:bg-white/[0.07]"}`}>
                       <motion.span animate={mood === item.value ? { scale: [1, 1.45, 1], opacity: [1, 0.45, 1] } : { scale: 1, opacity: 1 }} transition={{ duration: 0.7, ease: "easeOut" }} className="absolute -right-5 -top-5 size-20 rounded-full blur-xl" style={{ backgroundColor: item.color }} />
-                      <motion.span animate={mood === item.value ? { scale: [1, 1.15, 1], rotate: [0, -8, 8, 0] } : { scale: 1, rotate: 0 }} transition={{ duration: 0.55 }} className="relative z-10 mb-6 block text-3xl leading-none" role="img" aria-label={item.name}>{item.emoji}</motion.span>
+                      <motion.span animate={mood === item.value ? { scale: [1, 1.22, 1], rotate: [0, -8, 8, 0] } : { scale: 1, rotate: 0 }} transition={{ duration: 0.55 }} className={`relative z-10 mb-6 grid size-14 place-items-center rounded-full text-3xl leading-none transition-all ${mood === item.value ? "border border-white/35 bg-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_12px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl" : "bg-white/[0.04]"}`} role="img" aria-label={item.name}>{item.emoji}</motion.span>
                       <span className="relative z-10 block text-sm font-semibold">{item.name}</span><span className={`relative z-10 mt-1 block text-[11px] leading-4 ${mood === item.value ? "text-[#18212b]/60" : "text-white/40"}`}>{item.detail}</span>
                     </motion.button>
                   ))}
+                  </div>
                 </div>
-                <p className="mt-6 text-xs text-white/35">There is no better or worse answer. Noticing is enough.</p>
+                <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs text-white/35">There is no better or worse answer. Noticing is enough.</p>
+                  <button type="button" disabled={!mood} onClick={() => setStep("context")} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#c9d8b5] px-5 py-2.5 text-sm font-semibold text-[#18212b] transition hover:bg-[#d9e8c6] disabled:cursor-not-allowed disabled:opacity-35">Continue <ArrowRight className="size-4" /></button>
+                </div>
               </motion.div>
             )}
 
