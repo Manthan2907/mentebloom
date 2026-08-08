@@ -38,7 +38,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
 
   return (
     <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 overflow-y-auto bg-[#081019] p-3 text-[#f6f3eb] sm:p-6 lg:grid lg:place-items-center">
-      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1180px] flex-col overflow-hidden rounded-[2rem] border border-white/15 bg-[#15202b]/95 shadow-[0_40px_120px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:min-h-[calc(100vh-3rem)] lg:min-h-[665px] lg:grid lg:grid-cols-[0.84fr_1.16fr]">
+      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1180px] flex-col overflow-y-auto rounded-[2rem] border border-white/15 bg-[#15202b]/95 shadow-[0_40px_120px_rgba(0,0,0,0.48)] backdrop-blur-2xl sm:min-h-[calc(100vh-3rem)] lg:min-h-[665px] lg:grid lg:grid-cols-[0.84fr_1.16fr] lg:overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute -left-20 top-1/3 size-64 rounded-full bg-[#c9d8b5]/15 blur-3xl" />
         <div aria-hidden="true" className="pointer-events-none absolute -right-20 bottom-0 size-72 rounded-full bg-[#b6d875]/10 blur-3xl" />
 
@@ -55,25 +55,58 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
         </section>
 
         <section className="relative flex flex-1 flex-col p-6 sm:p-10 lg:p-14">
-          <div className="mb-8 flex items-center justify-between gap-4">
-            <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c9d8b5]/75">Daily pulse</p><p className="mt-2 text-sm text-white/45">A minute for your inner weather</p></div>
+          <div className="mb-8 flex items-center justify-end">
             <button type="button" onClick={() => { setMood("okay", [], ""); onComplete(); }} className="text-xs text-white/45 underline-offset-4 transition hover:text-white hover:underline">Skip for now</button>
           </div>
 
           <AnimatePresence mode="wait">
-            {step === "mood" && <motion.div key="mood" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.35 }}>
-              <h2 className="max-w-xl font-display text-[2.55rem] leading-[0.98] tracking-[-0.035em] sm:text-6xl lg:text-[4.2rem]">What is the truest word for today?</h2>
-              <div className="relative mt-9">
-                <motion.div aria-hidden="true" className="pointer-events-none absolute -top-4 hidden h-4 w-5 -translate-x-1/2 sm:block" animate={{ left: mood ? `${((MOODS.findIndex((item) => item.value === mood) + 0.5) / MOODS.length) * 100}%` : "0%", opacity: mood ? 1 : 0 }} transition={{ type: "spring", stiffness: 250, damping: 24 }}><div className="mx-auto h-0 w-0 border-x-[10px] border-t-[10px] border-x-transparent border-t-[#c9d8b5] drop-shadow-[0_0_12px_rgba(201,216,181,0.7)]" /></motion.div>
-                <div className="grid gap-2 sm:grid-cols-5">
-                  {MOODS.map((item) => <motion.button type="button" key={item.value} whileHover={{ y: -4 }} whileTap={{ scale: 0.97 }} onClick={() => setMoodChoice(item.value)} aria-pressed={mood === item.value} className={`group relative min-h-36 overflow-hidden rounded-[1.2rem] border p-3 text-left transition-all sm:min-h-40 ${mood === item.value ? "border-white/50 bg-white/[0.2] shadow-[0_20px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl" : "border-white/10 bg-white/[0.035] hover:border-white/30 hover:bg-white/[0.09]"}`}>
-                    <motion.span animate={mood === item.value ? { scale: [1, 1.4, 1], opacity: [0.55, 0.95, 0.55] } : { scale: 1, opacity: 0.35 }} transition={{ duration: 1.2, repeat: mood === item.value ? Infinity : 0 }} className="absolute -right-5 -top-5 size-24 rounded-full blur-xl" style={{ backgroundColor: item.color }} />
-                    <motion.span animate={mood === item.value ? { scale: [1, 1.18, 1], rotate: [0, -7, 7, 0] } : { scale: 1 }} transition={{ duration: 0.55 }} className={`relative z-10 mb-6 grid size-14 place-items-center rounded-full text-3xl leading-none transition-all ${mood === item.value ? "border border-white/45 bg-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_12px_30px_rgba(0,0,0,0.22)] backdrop-blur-xl" : "bg-white/[0.05]"}`} role="img" aria-label={item.name}>{item.emoji}</motion.span>
-                    <span className="relative z-10 block text-sm font-semibold">{item.name}</span><span className="relative z-10 mt-1 block text-[11px] leading-4 text-white/45">{item.detail}</span>
-                  </motion.button>)}
-                </div>
+            {step === "mood" && <motion.div key="mood" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.35 }} className="flex flex-col items-center text-center">
+              <h2 className="max-w-md font-display text-[2.3rem] leading-[1.02] tracking-[-0.02em] sm:text-5xl">How would you describe your mood?</h2>
+              <AnimatePresence mode="wait">
+                <motion.p key={mood ?? "none"} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }} className="mt-4 text-base font-medium" style={{ color: mood ? selected.color : "rgba(255,255,255,0.35)" }}>
+                  {mood ? `I feel ${selected.name.toLowerCase()}.` : "Notice where you are right now."}
+                </motion.p>
+              </AnimatePresence>
+
+              <motion.div key={`face-${mood ?? "none"}`} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 18 }} className="relative z-20 mt-8 grid size-28 place-items-center rounded-full border border-white/20 text-5xl shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:size-32" style={{ backgroundColor: mood ? `${selected.color}cc` : "rgba(255,255,255,0.08)" }}>
+                <span role="img" aria-label={mood ? selected.name : "Neutral"}>{mood ? selected.emoji : "😐"}</span>
+              </motion.div>
+
+              <div className="relative mt-2 flex h-44 w-full max-w-md items-end justify-center sm:h-48">
+                {MOODS.map((item, index) => {
+                  const isSelected = mood === item.value;
+                  const angle = (index - (MOODS.length - 1) / 2) * 17;
+                  const height = 140 - Math.abs(index - 2) * 16;
+                  return (
+                    <motion.button
+                      type="button"
+                      key={item.value}
+                      onClick={() => setMoodChoice(item.value)}
+                      aria-pressed={isSelected}
+                      aria-label={item.name}
+                      className="absolute bottom-0 left-1/2 origin-bottom outline-none"
+                      style={{ width: 96, height, zIndex: isSelected ? 10 : index }}
+                      animate={{ rotate: angle, x: "-50%", y: isSelected ? -14 : 0 }}
+                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                      whileHover={{ y: -8 }}
+                    >
+                      <span
+                        className={`block h-full w-full border transition-all ${isSelected ? "border-white/50 shadow-[0_0_0_1px_rgba(255,255,255,0.25),0_18px_35px_rgba(0,0,0,0.35)] backdrop-blur-md" : "border-white/10"}`}
+                        style={{
+                          backgroundColor: isSelected ? `${item.color}e6` : `${item.color}55`,
+                          clipPath: "polygon(50% 100%, 4% 22%, 22% 0%, 78% 0%, 96% 22%)",
+                        }}
+                      />
+                      <motion.span animate={{ rotate: -angle }} className="pointer-events-none absolute left-1/2 top-6 -translate-x-1/2 text-2xl leading-none" role="img" aria-hidden="true">
+                        {item.emoji}
+                      </motion.span>
+                    </motion.button>
+                  );
+                })}
+                <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-1/2 h-0 w-0 -translate-x-1/2 translate-y-full border-x-[10px] border-t-[16px] border-x-transparent border-t-[#f3f1e8]" />
               </div>
-              <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><p className="text-xs text-white/35">There is no better or worse answer. Noticing is enough.</p><button type="button" disabled={!mood} onClick={() => setStep("context")} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#c9d8b5] px-5 py-2.5 text-sm font-semibold text-[#18212b] transition hover:bg-[#d9e8c6] disabled:cursor-not-allowed disabled:opacity-35">Continue <ArrowRight className="size-4" /></button></div>
+
+              <div className="mt-10 flex w-full max-w-md flex-col items-center gap-4 sm:flex-row sm:justify-between"><p className="text-xs text-white/35">There is no better or worse answer. Noticing is enough.</p><button type="button" disabled={!mood} onClick={() => setStep("context")} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#c9d8b5] px-5 py-2.5 text-sm font-semibold text-[#18212b] transition hover:bg-[#d9e8c6] disabled:cursor-not-allowed disabled:opacity-35">Continue <ArrowRight className="size-4" /></button></div>
             </motion.div>}
 
             {step === "context" && <motion.div key="context" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -18 }}><div className="mb-8 flex items-center gap-3"><span className="size-3 rounded-full" style={{ backgroundColor: selected.color }} /><p className="text-sm text-white/55">You feel <span className="font-semibold text-white">{selected.name.toLowerCase()}</span> today.</p></div><h2 className="max-w-lg font-display text-3xl leading-tight sm:text-5xl">What is part of the picture?</h2><div className="mt-8 flex flex-wrap gap-3">{FACTORS.map((factor) => <button type="button" key={factor} onClick={() => setFactors((current) => current.includes(factor) ? current.filter((item) => item !== factor) : [...current, factor])} className={`rounded-full border px-5 py-3 text-sm transition-colors ${factors.includes(factor) ? "border-[#c9d8b5] bg-[#c9d8b5] text-[#18212b]" : "border-white/15 text-white/65 hover:border-white/40"}`}>{factors.includes(factor) && <Check className="mr-2 inline size-4" />}{factor}</button>)}</div><button type="button" onClick={() => setStep("reflection")} className="mt-10 inline-flex items-center gap-3 rounded-full bg-[#c9d8b5] px-6 py-3 text-sm font-semibold text-[#18212b]">Continue <ArrowRight className="size-4" /></button></motion.div>}
