@@ -16,20 +16,26 @@ This document contains a complete technical and feature summary of everything im
 ---
 
 ## 2. Core Dashboard & Navigation
-- **Header Navigation Bar (`TopNav.tsx`)**:
-  - Sticky header bar with direct navigation tabs: **`DASHBOARD`**, **`JOURNAL`**, **`ANALYTICS`**, **`WELLNESS`**, **`ACADEMIC`**, **`CONSULTATION`**, and **`MEDITATION`**.
+- **Header Navigation (`TopNav.tsx` & `PillNav.tsx`)**:
+  - Fixed-width pill navigation bar with disabled initial re-expand animations on route changes (`initialLoadAnimation={false}`).
+  - Applied `scrollbar-gutter: stable` and `shrink-0` layout constraints to prevent horizontal layout shift and wobbling when switching between pages. Tabs: **`DASHBOARD`**, **`JOURNAL`**, **`ANALYTICS`**, **`WELLNESS`**, **`ACADEMIC`**, **`CONSULTATION`**, and **`MEDITATION`**.
   - **Focus Feature Removed**: Removed the `/app/productivity` Pomodoro/Focus route and link from `TopNav.tsx` and `App.tsx`.
 - **Historical Habit Tracking Grid (`HabitsTable.tsx`)**:
   - Full time-travel date navigation (`< Prev` and `Next >`).
   - **Week Mode**: 7-day daily checkbox grid with checkmark micro-animations.
   - **Month Mode**: Adaptive 30-day calendar matrix.
   - **Future Date Locking**: Checkboxes beyond the current date are disabled and rendered faded to prevent logging habits in the future.
+- **Counselor Consultation (`Consultation.tsx`)**:
+  - Direct booking & consultation directory featuring top Indian clinical psychologists, psychiatrists, and NIMHANS/AIIMS certified specialists.
 - **Hero Heading (`HeroSection.tsx`)**:
   - Displays **"Daily <dynamic_word>"** with static bold serif "Daily" and smoothly morphing italic accent words ("Practice", "Growing", "Learning", "Motivation", "Mindfulness", "Focus", "Reflection", "Progress") using Framer Motion `AnimatePresence`.
 - **Weekly Pulse Chart (`WeeklyPulse.tsx`)**:
   - Displays percentage of completed habits for each day of the current week.
   - Dynamic week-over-week performance comparison against the previous week.
   - Excludes future dates from skewing current week averages.
+- **Wellness Score (`WellnessScore.tsx`)**:
+  - Animated progress ring and category breakdown (Mood, Habits, Water, Journal).
+  - Background features interactive WebGL `Silk` shader background (`@react-three/fiber`) with high-contrast text labels (`text-[#1a1a1a]/85`), live percentage badges (`48%`, `80%`, `100%`), and thickened progress tracks.
 - **Zustand Reactive Store (`lib/store.ts`)**:
   - Global single source of truth for habits, streak, hydration, mood history, journal entries, intentions, sleep, exercise, and academic tasks.
   - Persisted in `localStorage` via Zustand middleware (`mentebloom-v3-storage`).
@@ -105,6 +111,7 @@ This document contains a complete technical and feature summary of everything im
 | `glass-shine-card.tsx` | Glassmorphism card container with glossy shine animation sweep effect | CSS Keyframes, Tailwind, React |
 | `OverlappingMoodStack.tsx` | Overlapping avatar circular emoji badge stack component matching reference design | `framer-motion`, Tailwind, React |
 | `SpecularButton.tsx` | Interactive WebGL shader specular highlight glass button component (`ogl`) | WebGL, `ogl`, Tailwind, React |
+| `Silk.tsx` | Dynamic animated silk wave shader canvas component (`@react-three/fiber`) | WebGL, `@react-three/fiber`, `three`, React |
 | `GradientWaves.tsx` | Full-screen raymarching sine-plasma wave WebGL background with frame-by-frame color lerping, grain, and mouse parallax | WebGL, `ogl`, React |
 | `MaskedHeading.tsx` | Text masking heading component powered by GSAP entrance animations | GSAP, SVG ClipPath |
 | `WaveMaskedHeading.tsx` | Specialized heading component masking live WebGL `GradientWaves` inside text glyphs | WebGL, GSAP, SVG ClipPath |

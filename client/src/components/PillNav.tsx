@@ -295,7 +295,7 @@ const PillNav: React.FC<PillNavProps> = ({
 
         <div
           ref={navItemsRef}
-          className="relative items-center rounded-full hidden md:flex ml-2"
+          className="relative items-center rounded-full hidden md:flex ml-2 shrink-0"
           style={{
             height: 'var(--nav-h)',
             background: 'var(--base, #000)'

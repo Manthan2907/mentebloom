@@ -23,11 +23,11 @@ export function TopNav() {
   ];
 
   return (
-    <header className="bg-[#faf8f5] border-b border-[#e8e4df] sticky top-0 z-50">
+    <header className="bg-[#faf8f5] border-b border-[#e8e4df] sticky top-0 z-50 shrink-0 w-full">
       <div className="container max-w-[1280px] mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-14">
+        <div className="flex items-center justify-between h-14 min-h-[56px]">
           {/* Left — Logo & Header Nav Headings */}
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 shrink-0">
             <Link href="/" className="flex items-center gap-1.5 cursor-pointer">
               <div className="w-5 h-5 bg-[#c8f54e] rounded-sm flex items-center justify-center">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -47,7 +47,7 @@ export function TopNav() {
               pillColor="#f5f3ef"
               pillTextColor="#1a1a1a"
               hoveredPillTextColor="#c8f54e"
-              initialLoadAnimation={true}
+              initialLoadAnimation={false}
             />
           </div>
 

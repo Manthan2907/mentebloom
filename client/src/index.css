@@ -47,6 +47,11 @@
   --font-serif: var(--font-display);
 }
 
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
 :root {
   --radius: 0.75rem;
   --background: oklch(0.98 0.005 80);

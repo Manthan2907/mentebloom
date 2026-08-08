@@ -237,7 +237,7 @@ export const SpecularButton = ({
 
       idleAngle += p.speed * dt;
       const steer = p.followMouse && pointerAngle != null && (!p.autoAnimate || proximityT > 0);
-      const target = steer ? pointerAngle : idleAngle;
+      const target = steer && pointerAngle != null ? pointerAngle : idleAngle;
       const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
       angle += diff * (1 - Math.exp(-dt * 7));
 
@@ -282,7 +282,7 @@ export const SpecularButton = ({
           '--sb-tint-opacity': tintOpacity,
           '--sb-blur': `${blur}px`,
           '--sb-text-color': textColor
-        } as CSSProperties
+        } as any
       }
     >
       <span ref={fxRef} aria-hidden="true" className="pointer-events-none absolute -inset-5 z-[1] [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full" />
