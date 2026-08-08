@@ -9,6 +9,9 @@ import AcademicStress from "./pages/AcademicStress";
 import Consultation from "./pages/Consultation";
 import Meditation from "./pages/Meditation";
 import LandingPage from "./pages/LandingPage";
+import Analytics from "./pages/Analytics";
+import Wellness from "./pages/Wellness";
+import Journal from "./pages/Journal";
 import { ReactLenis } from "lenis/react";
 
 function Router() {
@@ -22,6 +25,9 @@ function Router() {
       <Route path={"/consultation"} component={Consultation} />
       <Route path={"/app/meditation"} component={Meditation} />
       <Route path={"/meditation"} component={Meditation} />
+      <Route path={"/app/analytics"} component={Analytics} />
+      <Route path={"/app/wellness"} component={Wellness} />
+      <Route path={"/app/journal"} component={Journal} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

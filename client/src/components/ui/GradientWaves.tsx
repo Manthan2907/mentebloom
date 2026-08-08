@@ -183,6 +183,11 @@ const GradientWaves: React.FC<GradientWavesProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const enableMouseRef = useRef<boolean>(mouseInteraction);
+  const targetColorsRef = useRef({
+    horizon: hexToRgb(horizonColor),
+    wave: hexToRgb(waveColor),
+    crest: hexToRgb(crestColor)
+  });
 
   useEffect(() => {
     const container = containerRef.current;
@@ -282,6 +287,24 @@ const GradientWaves: React.FC<GradientWavesProps> = ({
       const m = (program.uniforms.uMouse as { value: Float32Array }).value;
       m[0] = currentMouse[0];
       m[1] = currentMouse[1];
+
+      const hc = (program.uniforms.uHorizonColor as { value: Float32Array }).value;
+      const wc = (program.uniforms.uWaveColor as { value: Float32Array }).value;
+      const cc = (program.uniforms.uCrestColor as { value: Float32Array }).value;
+      const tc = targetColorsRef.current;
+
+      hc[0] += 0.05 * (tc.horizon[0] - hc[0]);
+      hc[1] += 0.05 * (tc.horizon[1] - hc[1]);
+      hc[2] += 0.05 * (tc.horizon[2] - hc[2]);
+
+      wc[0] += 0.05 * (tc.wave[0] - wc[0]);
+      wc[1] += 0.05 * (tc.wave[1] - wc[1]);
+      wc[2] += 0.05 * (tc.wave[2] - wc[2]);
+
+      cc[0] += 0.05 * (tc.crest[0] - cc[0]);
+      cc[1] += 0.05 * (tc.crest[1] - cc[1]);
+      cc[2] += 0.05 * (tc.crest[2] - cc[2]);
+
       renderer.render({ scene: mesh });
       raf = requestAnimationFrame(loop);
     };
@@ -355,21 +378,12 @@ const GradientWaves: React.FC<GradientWavesProps> = ({
     u.uGrainIntensity.value = grainIntensity;
     u.uParallax.value = parallaxStrength;
     u.uEnableMouse.value = mouseInteraction;
-    const hc = u.uHorizonColor.value as Float32Array;
-    const wc = u.uWaveColor.value as Float32Array;
-    const cc = u.uCrestColor.value as Float32Array;
-    const h = hexToRgb(horizonColor);
-    const w = hexToRgb(waveColor);
-    const cr = hexToRgb(crestColor);
-    hc[0] = h[0];
-    hc[1] = h[1];
-    hc[2] = h[2];
-    wc[0] = w[0];
-    wc[1] = w[1];
-    wc[2] = w[2];
-    cc[0] = cr[0];
-    cc[1] = cr[1];
-    cc[2] = cr[2];
+
+    targetColorsRef.current = {
+      horizon: hexToRgb(horizonColor),
+      wave: hexToRgb(waveColor),
+      crest: hexToRgb(crestColor)
+    };
   }, [
     horizonColor,
     waveColor,

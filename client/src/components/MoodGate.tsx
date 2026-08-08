@@ -10,6 +10,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/lib/store";
 import type { Mood } from "@/lib/store";
 import { MOOD_COLORS } from "./MoodFaces";
+import GradientWaves from "./ui/GradientWaves";
+
+const MOOD_WAVE_COLORS: Record<Mood, { horizon: string, wave: string, crest: string }> = {
+  sad: { horizon: "#050000", wave: "#4a1520", crest: "#a33d4e" },
+  low: { horizon: "#020005", wave: "#2c1a40", crest: "#7a52a3" },
+  okay: { horizon: "#050505", wave: "#4a4641", crest: "#d4ccbe" },
+  good: { horizon: "#000508", wave: "#1a2c40", crest: "#527aa3" },
+  great: { horizon: "#000500", wave: "#1a4020", crest: "#52a36b" }
+};
 
 interface MoodSegment {
   value: Mood;
@@ -139,294 +148,328 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
       className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
       style={{ backgroundColor, transition: 'background-color 0.5s ease' }}
     >
-      <AnimatePresence mode="wait">
-        {phase === "dial" && (
-          <motion.div
-            key="dial"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
-            className="flex flex-col items-center w-full max-w-lg px-6"
-          >
-            {/* Skip button */}
-            <div className="w-full flex justify-end mb-6">
-              <button
-                onClick={handleSkip}
-                className="text-sm font-sans text-[#1a1a1a]/30 hover:text-[#1a1a1a]/60 transition-colors"
-              >
-                Skip
-              </button>
-            </div>
-
-            {/* Title */}
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-[#1a1a1a] text-center mb-3 leading-tight">
-              How would you describe
-              <br />
-              your mood?
-            </h2>
-
-            {/* "I Feel..." text */}
-            <motion.p
-              key={`mood-text-${currentMood}`}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className="text-xl font-sans mt-2 mb-3"
-              style={{ color: currentMoodData.color }}
-            >
-              {currentMoodData.text}
-            </motion.p>
-
-            {/* Large mood face */}
+      <AnimatePresence>
+        <motion.div
+          key="gradient-waves-bg"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          className="absolute inset-0 z-0"
+        >
+          <GradientWaves
+            horizonColor={MOOD_WAVE_COLORS[currentMood as Mood]?.horizon || MOOD_WAVE_COLORS.okay.horizon}
+            waveColor={MOOD_WAVE_COLORS[currentMood as Mood]?.wave || MOOD_WAVE_COLORS.okay.wave}
+            crestColor={MOOD_WAVE_COLORS[currentMood as Mood]?.crest || MOOD_WAVE_COLORS.okay.crest}
+            speed={0.6}
+            amplitude={5.0}
+            waveScale={0.4}
+            waveRatio={0.8}
+            swell={60}
+            turbulence={35}
+            tilt={1.1}
+            zoom={0.8}
+            height={4.0}
+            fogDepth={12}
+            detail="high"
+            brightness={1.5}
+            opacity={1.0}
+            mouseInteraction={true}
+            parallaxStrength={1.5}
+            grain={true}
+            grainIntensity={0.08}
+          />
+        </motion.div>
+      </AnimatePresence>
+      <div className="relative z-10 w-full h-full flex items-center justify-center">
+        <AnimatePresence mode="wait">
+          {phase === "dial" && (
             <motion.div
-              key={`mood-face-${currentMood}`}
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="mb-4"
+              key="dial"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
+              className="flex flex-col items-center w-full max-w-lg px-6"
             >
-              <LargeFace mood={currentMood} size={140} />
-            </motion.div>
+              {/* Skip button */}
+              <div className="w-full flex justify-end mb-6">
+                <button
+                  onClick={handleSkip}
+                  className="text-sm font-sans text-[#1a1a1a]/30 hover:text-[#1a1a1a]/60 transition-colors"
+                >
+                  Skip
+                </button>
+              </div>
 
-            {/* Gauge area — SVG background + clickable buttons */}
-            <div className="relative w-[380px] h-[220px] mb-4 overflow-hidden">
-              {/* SVG gauge background (decorative) */}
-              <svg
-                viewBox="0 0 380 210"
-                className="absolute inset-0 w-full h-full"
+              {/* Title */}
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-[#1a1a1a] text-center mb-3 leading-tight">
+                How would you describe
+                <br />
+                your mood?
+              </h2>
+
+              {/* "I Feel..." text */}
+              <motion.p
+                key={`mood-text-${currentMood}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="text-xl font-sans mt-2 mb-3"
+                style={{ color: currentMoodData.color }}
               >
-                {/* Semicircle arc segments */}
-                {MOOD_SEGMENTS.map((segment, i) => {
-                  const startDeg = 180 - ((i + 1) * 36);
-                  const endDeg = 180 - (i * 36);
-                  const cx = 190;
-                  const cy = 200;
-                  const outerR = 180;
-                  const innerR = 70;
+                {currentMoodData.text}
+              </motion.p>
 
-                  const isActive = currentMood === segment.value;
+              {/* Large mood face */}
+              <motion.div
+                key={`mood-face-${currentMood}`}
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="mb-4"
+              >
+                <LargeFace mood={currentMood} size={140} />
+              </motion.div>
 
-                  const outerStartX = cx + outerR * Math.cos((startDeg * Math.PI) / 180);
-                  const outerStartY = cy - outerR * Math.sin((startDeg * Math.PI) / 180);
-                  const outerEndX = cx + outerR * Math.cos((endDeg * Math.PI) / 180);
-                  const outerEndY = cy - outerR * Math.sin((endDeg * Math.PI) / 180);
+              {/* Gauge area — SVG background + clickable buttons */}
+              <div className="relative w-[380px] h-[220px] mb-4 overflow-hidden">
+                {/* SVG gauge background (decorative) */}
+                <svg
+                  viewBox="0 0 380 210"
+                  className="absolute inset-0 w-full h-full"
+                >
+                  {/* Semicircle arc segments */}
+                  {MOOD_SEGMENTS.map((segment, i) => {
+                    const startDeg = 180 - ((i + 1) * 36);
+                    const endDeg = 180 - (i * 36);
+                    const cx = 190;
+                    const cy = 200;
+                    const outerR = 180;
+                    const innerR = 70;
 
-                  const innerEndX = cx + innerR * Math.cos((endDeg * Math.PI) / 180);
-                  const innerEndY = cy - innerR * Math.sin((endDeg * Math.PI) / 180);
-                  const innerStartX = cx + innerR * Math.cos((startDeg * Math.PI) / 180);
-                  const innerStartY = cy - innerR * Math.sin((startDeg * Math.PI) / 180);
+                    const isActive = currentMood === segment.value;
 
-                  const spanDeg = endDeg - startDeg;
-                  const largeArc = spanDeg > 180 ? 1 : 0;
+                    const outerStartX = cx + outerR * Math.cos((startDeg * Math.PI) / 180);
+                    const outerStartY = cy - outerR * Math.sin((startDeg * Math.PI) / 180);
+                    const outerEndX = cx + outerR * Math.cos((endDeg * Math.PI) / 180);
+                    const outerEndY = cy - outerR * Math.sin((endDeg * Math.PI) / 180);
 
-                  const d = [
-                    `M ${outerStartX} ${outerStartY}`,
-                    `A ${outerR} ${outerR} 0 ${largeArc} 1 ${outerEndX} ${outerEndY}`,
-                    `L ${innerEndX} ${innerEndY}`,
-                    `A ${innerR} ${innerR} 0 ${largeArc} 0 ${innerStartX} ${innerStartY}`,
-                    `Z`,
-                  ].join(" ");
+                    const innerEndX = cx + innerR * Math.cos((endDeg * Math.PI) / 180);
+                    const innerEndY = cy - innerR * Math.sin((endDeg * Math.PI) / 180);
+                    const innerStartX = cx + innerR * Math.cos((startDeg * Math.PI) / 180);
+                    const innerStartY = cy - innerR * Math.sin((startDeg * Math.PI) / 180);
+
+                    const spanDeg = endDeg - startDeg;
+                    const largeArc = spanDeg > 180 ? 1 : 0;
+
+                    const d = [
+                      `M ${outerStartX} ${outerStartY}`,
+                      `A ${outerR} ${outerR} 0 ${largeArc} 1 ${outerEndX} ${outerEndY}`,
+                      `L ${innerEndX} ${innerEndY}`,
+                      `A ${innerR} ${innerR} 0 ${largeArc} 0 ${innerStartX} ${innerStartY}`,
+                      `Z`,
+                    ].join(" ");
+
+                    return (
+                      <path
+                        key={segment.value}
+                        d={d}
+                        fill={segment.color}
+                        opacity={isActive ? 1 : 0.5}
+                        style={{ transition: "opacity 0.25s" }}
+                      />
+                    );
+                  })}
+
+                  {/* Small face circles drawn as SVG (not foreignObject) */}
+                  {MOOD_SEGMENTS.map((segment, i) => {
+                    const midDeg = 180 - (i * 36) - 18;
+                    const faceR = 125;
+                    const fx = 190 + faceR * Math.cos((midDeg * Math.PI) / 180);
+                    const fy = 200 - faceR * Math.sin((midDeg * Math.PI) / 180);
+                    const isActive = currentMood === segment.value;
+
+                    return (
+                      <g key={`mini-${segment.value}`}>
+                        <circle cx={fx} cy={fy} r={20} fill={segment.color} opacity={isActive ? 1 : 0.7} style={{ transition: "opacity 0.25s" }} />
+                        <SmallFaceSvg cx={fx} cy={fy} mood={segment.value} />
+                      </g>
+                    );
+                  })}
+                </svg>
+
+                {/* Clickable invisible buttons positioned over each segment */}
+                {MOOD_SEGMENTS.map((segment) => {
+                  const midDeg = 180 - (segment.position * 36) - 18;
+                  const btnR = 125;
+                  // Position as percentage of container
+                  const pctX = ((190 + btnR * Math.cos((midDeg * Math.PI) / 180)) / 380) * 100;
+                  const pctY = ((200 - btnR * Math.sin((midDeg * Math.PI) / 180)) / 210) * 100;
 
                   return (
-                    <path
-                      key={segment.value}
-                      d={d}
-                      fill={segment.color}
-                      opacity={isActive ? 1 : 0.5}
-                      style={{ transition: "opacity 0.25s" }}
+                    <button
+                      key={`btn-${segment.value}`}
+                      onClick={() => handleMoodClick(segment.value)}
+                      onMouseEnter={() => setHoveredMood(segment.value)}
+                      onMouseLeave={() => setHoveredMood(null)}
+                      className="absolute w-12 h-12 -ml-6 -mt-6 rounded-full cursor-pointer"
+                      style={{
+                        left: `${pctX}%`,
+                        top: `${pctY}%`,
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        zIndex: 10,
+                      }}
+                      aria-label={`Select ${segment.label} mood`}
                     />
                   );
                 })}
 
-                {/* Small face circles drawn as SVG (not foreignObject) */}
-                {MOOD_SEGMENTS.map((segment, i) => {
-                  const midDeg = 180 - (i * 36) - 18;
-                  const faceR = 125;
-                  const fx = 190 + faceR * Math.cos((midDeg * Math.PI) / 180);
-                  const fy = 200 - faceR * Math.sin((midDeg * Math.PI) / 180);
-                  const isActive = currentMood === segment.value;
+                {/* Needle indicator */}
+                <AnimatePresence>
+                  {currentMood && (
+                    <motion.div
+                      key="needle"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-14 pointer-events-none"
+                      style={{ zIndex: 5 }}
+                    >
+                      <svg viewBox="0 0 20 56" className="w-full h-full">
+                        <polygon points="10,0 0,56 20,56" fill="#1a1a1a" />
+                        <circle cx="10" cy="50" r="6" fill="#1a1a1a" />
+                      </svg>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-                  return (
-                    <g key={`mini-${segment.value}`}>
-                      <circle cx={fx} cy={fy} r={20} fill={segment.color} opacity={isActive ? 1 : 0.7} style={{ transition: "opacity 0.25s" }} />
-                      <SmallFaceSvg cx={fx} cy={fy} mood={segment.value} />
-                    </g>
-                  );
-                })}
-              </svg>
-
-              {/* Clickable invisible buttons positioned over each segment */}
-              {MOOD_SEGMENTS.map((segment) => {
-                const midDeg = 180 - (segment.position * 36) - 18;
-                const btnR = 125;
-                // Position as percentage of container
-                const pctX = ((190 + btnR * Math.cos((midDeg * Math.PI) / 180)) / 380) * 100;
-                const pctY = ((200 - btnR * Math.sin((midDeg * Math.PI) / 180)) / 210) * 100;
-
-                return (
-                  <button
-                    key={`btn-${segment.value}`}
-                    onClick={() => handleMoodClick(segment.value)}
-                    onMouseEnter={() => setHoveredMood(segment.value)}
-                    onMouseLeave={() => setHoveredMood(null)}
-                    className="absolute w-12 h-12 -ml-6 -mt-6 rounded-full cursor-pointer"
-                    style={{
-                      left: `${pctX}%`,
-                      top: `${pctY}%`,
-                      background: "transparent",
-                      border: "none",
-                      outline: "none",
-                      zIndex: 10,
-                    }}
-                    aria-label={`Select ${segment.label} mood`}
-                  />
-                );
-              })}
-
-              {/* Needle indicator */}
+              {/* Continue button — only visible when mood is selected */}
               <AnimatePresence>
-                {currentMood && (
-                  <motion.div
-                    key="needle"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-14 pointer-events-none"
-                    style={{ zIndex: 5 }}
+                {selectedMood && phase === "dial" && (
+                  <motion.button
+                    key="continue-btn"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={() => setPhase("factors")}
+                    className="text-sm font-mono tracking-wider bg-[#c8f54e] text-[#1a1a1a] px-10 py-3 rounded-sm hover:bg-[#d4f76a] transition-colors uppercase font-semibold"
                   >
-                    <svg viewBox="0 0 20 56" className="w-full h-full">
-                      <polygon points="10,0 0,56 20,56" fill="#1a1a1a" />
-                      <circle cx="10" cy="50" r="6" fill="#1a1a1a" />
-                    </svg>
-                  </motion.div>
+                    Continue
+                  </motion.button>
                 )}
               </AnimatePresence>
-            </div>
-
-            {/* Continue button — only visible when mood is selected */}
-            <AnimatePresence>
-              {selectedMood && phase === "dial" && (
-                <motion.button
-                  key="continue-btn"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={() => setPhase("factors")}
-                  className="text-sm font-mono tracking-wider bg-[#c8f54e] text-[#1a1a1a] px-10 py-3 rounded-sm hover:bg-[#d4f76a] transition-colors uppercase font-semibold"
-                >
-                  Continue
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        )}
-
-        {phase === "factors" && (
-          <motion.div
-            key="factors"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
-            className="flex flex-col items-center w-full max-w-md px-6"
-          >
-            <div className="mb-8">
-              <LargeFace mood={selectedMood || "okay"} size={110} />
-            </div>
-
-            <h3 className="font-display text-2xl md:text-3xl font-bold text-[#1a1a1a] text-center mb-8">
-              What's affecting you?
-            </h3>
-
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-8 max-w-sm">
-              {FACTORS.map((factor) => (
-                <button
-                  key={factor}
-                  onClick={() => handleFactorToggle(factor)}
-                  className={`text-sm font-sans px-6 py-3 rounded-full border-2 transition-all duration-200 ${
-                    selectedFactors.includes(factor)
-                      ? "bg-[#c8f54e] text-[#1a1a1a] border-[#c8f54e] font-medium"
-                      : "bg-white text-[#1a1a1a]/50 border-[#e8e4df] hover:border-[#c8f54e]/40 hover:text-[#1a1a1a]/70"
-                  }`}
-                >
-                  {factor}
-                </button>
-              ))}
-            </div>
-
-            <p className="text-xs font-mono text-[#1a1a1a]/30 mb-6">
-              Select any that apply, or skip
-            </p>
-
-            <button
-              onClick={handleDone}
-              className="text-sm font-mono tracking-wider bg-[#c8f54e] text-[#1a1a1a] px-12 py-3 rounded-sm hover:bg-[#d4f76a] transition-colors uppercase font-semibold"
-            >
-              Done
-            </button>
-          </motion.div>
-        )}
-
-        {phase === "quote" && (
-          <motion.div
-            key="quote"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-            className="flex flex-col items-center w-full max-w-lg px-8"
-          >
-            <div className="mb-6">
-              <LargeFace mood={selectedMood || "okay"} size={80} />
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="relative"
-            >
-              <div className="absolute -left-8 -top-4 text-6xl font-display text-[#c8f54e]/40 select-none">"</div>
-              <p className="font-display text-2xl md:text-3xl text-[#1a1a1a] text-center leading-relaxed max-w-md italic">
-                {quote}
-              </p>
-              <div className="absolute -right-4 -bottom-6 text-6xl font-display text-[#c8f54e]/40 select-none rotate-180">"</div>
             </motion.div>
+          )}
 
+          {phase === "factors" && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
-              className="mt-10 flex items-center gap-2"
-            >
-              <div className="w-8 h-0.5 bg-[#c8f54e]" />
-              <span className="text-xs font-mono tracking-wider text-[#1a1a1a]/40 uppercase">Mentebloom</span>
-              <div className="w-8 h-0.5 bg-[#c8f54e]" />
-            </motion.div>
-          </motion.div>
-        )}
-
-        {phase === "done" && (
-          <motion.div
-            key="done"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center"
-          >
-            <LargeFace mood={selectedMood || "okay"} size={110} />
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
+              key="factors"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-xl font-display text-[#1a1a1a] mt-4"
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
+              className="flex flex-col items-center w-full max-w-md px-6"
             >
-              {currentMoodData?.text}
-            </motion.p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <div className="mb-8">
+                <LargeFace mood={selectedMood || "okay"} size={110} />
+              </div>
+
+              <h3 className="font-display text-2xl md:text-3xl font-bold text-[#1a1a1a] text-center mb-8">
+                What's affecting you?
+              </h3>
+
+              <div className="flex flex-wrap items-center justify-center gap-4 mb-8 max-w-sm">
+                {FACTORS.map((factor) => (
+                  <button
+                    key={factor}
+                    onClick={() => handleFactorToggle(factor)}
+                    className={`text-sm font-sans px-6 py-3 rounded-full border-2 transition-all duration-200 ${selectedFactors.includes(factor)
+                        ? "bg-[#c8f54e] text-[#1a1a1a] border-[#c8f54e] font-medium"
+                        : "bg-white text-[#1a1a1a]/50 border-[#e8e4df] hover:border-[#c8f54e]/40 hover:text-[#1a1a1a]/70"
+                      }`}
+                  >
+                    {factor}
+                  </button>
+                ))}
+              </div>
+
+              <p className="text-xs font-mono text-[#1a1a1a]/30 mb-6">
+                Select any that apply, or skip
+              </p>
+
+              <button
+                onClick={handleDone}
+                className="text-sm font-mono tracking-wider bg-[#c8f54e] text-[#1a1a1a] px-12 py-3 rounded-sm hover:bg-[#d4f76a] transition-colors uppercase font-semibold"
+              >
+                Done
+              </button>
+            </motion.div>
+          )}
+
+          {phase === "quote" && (
+            <motion.div
+              key="quote"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+              className="flex flex-col items-center w-full max-w-lg px-8"
+            >
+              <div className="mb-6">
+                <LargeFace mood={selectedMood || "okay"} size={80} />
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="relative"
+              >
+                <div className="absolute -left-8 -top-4 text-6xl font-display text-[#c8f54e]/40 select-none">"</div>
+                <p className="font-display text-2xl md:text-3xl text-[#1a1a1a] text-center leading-relaxed max-w-md italic">
+                  {quote}
+                </p>
+                <div className="absolute -right-4 -bottom-6 text-6xl font-display text-[#c8f54e]/40 select-none rotate-180">"</div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5 }}
+                className="mt-10 flex items-center gap-2"
+              >
+                <div className="w-8 h-0.5 bg-[#c8f54e]" />
+                <span className="text-xs font-mono tracking-wider text-[#1a1a1a]/40 uppercase">Mentebloom</span>
+                <div className="w-8 h-0.5 bg-[#c8f54e]" />
+              </motion.div>
+            </motion.div>
+          )}
+
+          {phase === "done" && (
+            <motion.div
+              key="done"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center"
+            >
+              <LargeFace mood={selectedMood || "okay"} size={110} />
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-xl font-display text-[#1a1a1a] mt-4"
+              >
+                {currentMoodData?.text}
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }
@@ -437,12 +480,12 @@ function LargeFace({ mood, size }: { mood: Mood; size: number }) {
   const mouthPath = mood === "sad"
     ? "M34 80 C48 66, 72 66, 86 80"
     : mood === "low"
-    ? "M38 76 L82 76"
-    : mood === "okay"
-    ? "M38 76 L82 76"
-    : mood === "good"
-    ? "M34 70 C48 86, 72 86, 86 70"
-    : "M30 66 C48 88, 72 88, 90 66";
+      ? "M38 76 L82 76"
+      : mood === "okay"
+        ? "M38 76 L82 76"
+        : mood === "good"
+          ? "M34 70 C48 86, 72 86, 86 70"
+          : "M30 66 C48 88, 72 88, 90 66";
 
   const eyeY = mood === "great" ? 44 : mood === "good" ? 46 : 50;
 
@@ -462,12 +505,12 @@ function SmallFaceSvg({ cx, cy, mood }: { cx: number; cy: number; mood: Mood }) 
   const mouthPath = mood === "sad"
     ? `M ${cx - 7} ${cy + 4} C ${cx - 2} ${cy - 1}, ${cx + 2} ${cy - 1}, ${cx + 7} ${cy + 4}`
     : mood === "low"
-    ? `M ${cx - 7} ${cy + 2} L ${cx + 7} ${cy + 2}`
-    : mood === "okay"
-    ? `M ${cx - 7} ${cy + 2} L ${cx + 7} ${cy + 2}`
-    : mood === "good"
-    ? `M ${cx - 7} ${cy - 1} C ${cx - 2} ${cy + 5}, ${cx + 2} ${cy + 5}, ${cx + 7} ${cy - 1}`
-    : `M ${cx - 9} ${cy - 2} C ${cx - 2} ${cy + 7}, ${cx + 2} ${cy + 7}, ${cx + 9} ${cy - 2}`;
+      ? `M ${cx - 7} ${cy + 2} L ${cx + 7} ${cy + 2}`
+      : mood === "okay"
+        ? `M ${cx - 7} ${cy + 2} L ${cx + 7} ${cy + 2}`
+        : mood === "good"
+          ? `M ${cx - 7} ${cy - 1} C ${cx - 2} ${cy + 5}, ${cx + 2} ${cy + 5}, ${cx + 7} ${cy - 1}`
+          : `M ${cx - 9} ${cy - 2} C ${cx - 2} ${cy + 7}, ${cx + 2} ${cy + 7}, ${cx + 9} ${cy - 2}`;
 
   return (
     <>
