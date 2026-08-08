@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Check, Leaf, PenLine, Sparkles } from "lucide-react";
+import { ArrowRight, Check, PenLine, Sparkles } from "lucide-react";
 import { useStore } from "@/lib/store";
 import type { Mood } from "@/lib/store";
 
@@ -45,7 +45,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
         <section className="relative min-h-64 min-w-0 flex flex-col justify-between overflow-hidden bg-[#c9d8b5] p-6 text-[#18212b] sm:min-h-72 sm:p-9 md:min-h-0 lg:p-10">
           <div aria-hidden="true" className="pointer-events-none absolute -left-16 top-20 size-48 rounded-full bg-white/25 blur-3xl" />
           <div aria-hidden="true" className="pointer-events-none absolute bottom-8 right-6 size-40 rounded-full bg-[#8cb29a]/30 blur-2xl" />
-          <div className="relative z-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"><Leaf className="size-4" /> mentebloom</div>
+          <div className="relative z-10 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"><img src="/mentebloom_flower.png" alt="" aria-hidden="true" className="size-7 object-contain mix-blend-multiply" /> <span>mentebloom</span></div>
           <div className="relative z-10 max-w-sm pb-28 sm:pb-32 md:pb-8">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#18212b]/55">A quiet arrival</p>
             <h1 className="font-display text-4xl font-semibold leading-[0.95] sm:text-5xl md:text-4xl lg:text-6xl">Before the day starts, check in with yourself.</h1>

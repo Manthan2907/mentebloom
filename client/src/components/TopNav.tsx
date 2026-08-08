@@ -34,11 +34,7 @@ export function TopNav({ onResetCheckIn }: TopNavProps) {
           {/* Left — Logo & Header Nav Headings */}
           <div className="flex items-center gap-5">
             <Link href="/" className="flex items-center gap-1.5 cursor-pointer">
-              <div className="w-5 h-5 bg-[#c8f54e] rounded-sm flex items-center justify-center">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M3 6l2 2 4-4" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
+              <img src="/mentebloom_flower.png" alt="" aria-hidden="true" className="h-7 w-7 object-contain mix-blend-multiply" />
               <span className="font-display font-bold text-base text-[#1a1a1a]">
                 Mentebloom
               </span>
