@@ -20,6 +20,7 @@ export interface MoodEntry {
   date: string; // YYYY-MM-DD
   mood: Mood;
   factors: string[];
+  note?: string;
 }
 
 export interface HydrationData {
@@ -107,8 +108,9 @@ export interface AppState {
   // Mood
   todayMood: Mood | null;
   moodFactors: string[];
+  moodNote: string;
   moodHistory: MoodEntry[];
-  setMood: (mood: Mood, factors: string[]) => void;
+  setMood: (mood: Mood, factors: string[], note?: string) => void;
 
   // Hydration
   hydration: HydrationData;
@@ -295,6 +297,7 @@ export const useStore = create<AppState>()(
       // Mood
       todayMood: null,
       moodFactors: [],
+      moodNote: '',
       moodHistory: Array.from({ length: 30 }, (_, i) => {
         const date = new Date();
         date.setDate(date.getDate() - (29 - i));
@@ -312,17 +315,17 @@ export const useStore = create<AppState>()(
         allFactors.forEach((f) => { if (Math.random() > 0.5) factors.push(f); });
         return { date: date.toISOString().split('T')[0], mood: mood as Mood, factors };
       }),
-      setMood: (mood, factors) => set((state) => {
+      setMood: (mood, factors, note = '') => set((state) => {
         const today = getTodayString();
         const existing = state.moodHistory.findIndex((e) => e.date === today);
-        const entry: MoodEntry = { date: today, mood, factors };
+        const entry: MoodEntry = { date: today, mood, factors, note };
         let newHistory = [...state.moodHistory];
         if (existing >= 0) {
           newHistory[existing] = entry;
         } else {
           newHistory.push(entry);
         }
-        return { todayMood: mood, moodFactors: factors, moodHistory: newHistory };
+        return { todayMood: mood, moodFactors: factors, moodNote: note, moodHistory: newHistory };
       }),
 
       // Hydration
