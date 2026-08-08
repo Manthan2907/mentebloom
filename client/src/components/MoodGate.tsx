@@ -67,6 +67,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
   const { setMood } = useStore();
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [selectedFactors, setSelectedFactors] = useState<string[]>([]);
+  const [reflection, setReflection] = useState("");
   const [phase, setPhase] = useState<"dial" | "factors" | "quote" | "done">("dial");
   const [hoveredMood, setHoveredMood] = useState<Mood | null>(null);
   const [quote, setQuote] = useState<string>("");
@@ -90,7 +91,7 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
 
   const handleDone = () => {
     if (selectedMood) {
-      setMood(selectedMood, selectedFactors);
+      setMood(selectedMood, selectedFactors, reflection.trim());
       setQuote(getRandomQuote(selectedMood));
       setPhase("quote");
       setTimeout(() => {
@@ -139,6 +140,15 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
       className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
       style={{ backgroundColor, transition: 'background-color 0.5s ease' }}
     >
+      <motion.img
+        src="/meditating_character.png"
+        alt=""
+        aria-hidden="true"
+        initial={{ opacity: 0, x: 40, scale: 0.96 }}
+        animate={{ opacity: 0.18, x: 0, scale: 1 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+        className="pointer-events-none absolute bottom-[-3rem] right-[-2rem] w-56 max-w-[45vw] object-contain md:bottom-[-4rem] md:right-[8vw] md:w-72"
+      />
       <AnimatePresence mode="wait">
         {phase === "dial" && (
           <motion.div
@@ -356,9 +366,23 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
               ))}
             </div>
 
-            <p className="text-xs font-mono text-[#1a1a1a]/30 mb-6">
+            <p className="text-xs font-mono text-[#1a1a1a]/30 mb-3">
               Select any that apply, or skip
             </p>
+
+            <div className="w-full max-w-sm mb-6">
+              <label htmlFor="mood-reflection" className="sr-only">What is on your mind today?</label>
+              <textarea
+                id="mood-reflection"
+                value={reflection}
+                onChange={(event) => setReflection(event.target.value)}
+                placeholder="What is on your mind today? (optional)"
+                maxLength={280}
+                rows={3}
+                className="w-full resize-none rounded-2xl border border-[#e8e4df] bg-white/75 px-4 py-3 text-sm text-[#1a1a1a] outline-none transition focus:border-[#1a1a1a] focus:ring-2 focus:ring-[#c8f54e]/50"
+              />
+              <div className="mt-1 text-right text-[10px] font-mono text-[#1a1a1a]/30">{reflection.length}/280</div>
+            </div>
 
             <button
               onClick={handleDone}

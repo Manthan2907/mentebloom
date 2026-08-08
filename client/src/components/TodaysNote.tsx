@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Brain } from "lucide-react";
+import { useStore } from "@/lib/store";
 import MoltenMetal from "@/components/ui/MoltenMetal";
 
 const NOTES = [
@@ -43,7 +44,15 @@ const variants = {
 };
 
 export function TodaysNote() {
+  const { todayMood, moodFactors, moodNote } = useStore();
   const [activeIdx, setActiveIdx] = useState(0);
+
+  const moodInsight = useMemo(() => {
+    if (!todayMood) return "Check in with yourself to unlock a small, personal read on today.";
+    const factor = moodFactors[0]?.toLowerCase();
+    const tone = todayMood === "sad" || todayMood === "low" ? "Take the pressure down a notch" : todayMood === "great" || todayMood === "good" ? "Protect the momentum you have" : "Keep today simple and steady";
+    return `${tone}${factor ? `, especially around ${factor}` : ""}. One honest next step is enough.`;
+  }, [moodFactors, todayMood]);
   const [direction, setDirection] = useState(0); // -1 for left, 1 for right
 
   const nextNote = () => {
@@ -94,6 +103,15 @@ export function TodaysNote() {
           ● TODAY
         </span>
       </div>
+
+      {/* Mood reflection and local analysis */}
+      {todayMood && (
+        <div className="relative z-10 mb-4 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2.5">
+          <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#c8f54e]"><Brain className="h-3.5 w-3.5" /> Mood read</div>
+          <p className="mt-1 text-sm leading-relaxed text-white/85">{moodInsight}</p>
+          {moodNote && <p className="mt-2 truncate text-xs italic text-white/45">“{moodNote}”</p>}
+        </div>
+      )}
 
       {/* Content Carousel with very smooth transitions */}
       <div className="relative z-10 h-14 overflow-hidden flex items-center">
