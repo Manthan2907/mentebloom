@@ -1,6 +1,12 @@
 # 🌸 Mentebloom — Mental Wellness & Academic Stress Platform
 
 <p align="center">
+  <a href="https://mental-wellness-lemon.vercel.app/">
+    <img src="https://img.shields.io/badge/🌐_Live_Demo-https%3A%2F%2Fmental--wellness--lemon.vercel.app%2F-000000?style=for-the-badge&logo=vercel&logoColor=white&color=000000" alt="Live Demo on Vercel" />
+  </a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/React-19.0.0-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-5.6-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vite-7.1-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
@@ -8,6 +14,8 @@
   <img src="https://img.shields.io/badge/WebGL-OGL-000000?style=for-the-badge&logo=webgl&logoColor=white" alt="WebGL OGL" />
   <img src="https://img.shields.io/badge/Framer_Motion-12.4-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
 </p>
+
+> 🚀 **Live Deployment URL**: [https://mental-wellness-lemon.vercel.app/](https://mental-wellness-lemon.vercel.app/)
 
 ---
 
