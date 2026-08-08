@@ -4,12 +4,12 @@ import { ArrowRight, Check, Leaf, PenLine, Sparkles } from "lucide-react";
 import { useStore } from "@/lib/store";
 import type { Mood } from "@/lib/store";
 
-const MOODS: Array<{ value: Mood; name: string; detail: string; color: string }> = [
-  { value: "sad", name: "Heavy", detail: "I need gentleness today", color: "#7d8aa3" },
-  { value: "low", name: "Low", detail: "I am moving slowly", color: "#a58c78" },
-  { value: "okay", name: "Steady", detail: "I am finding my balance", color: "#b7a66a" },
-  { value: "good", name: "Light", detail: "There is some ease today", color: "#7d9d80" },
-  { value: "great", name: "Bright", detail: "I feel open and energised", color: "#a8c878" },
+const MOODS: Array<{ value: Mood; name: string; detail: string; color: string; emoji: string }> = [
+  { value: "sad", name: "Heavy", detail: "I need gentleness today", color: "#7d8aa3", emoji: "😔" },
+  { value: "low", name: "Low", detail: "I am moving slowly", color: "#a58c78", emoji: "😕" },
+  { value: "okay", name: "Steady", detail: "I am finding my balance", color: "#b7a66a", emoji: "😐" },
+  { value: "good", name: "Light", detail: "There is some ease today", color: "#7d9d80", emoji: "🙂" },
+  { value: "great", name: "Bright", detail: "I feel open and energised", color: "#a8c878", emoji: "😊" },
 ];
 
 const FACTORS = ["Study", "Sleep", "People", "Health", "Work"];
@@ -70,10 +70,11 @@ export function MoodGate({ onComplete }: { onComplete: () => void }) {
                 <h2 className="max-w-lg font-display text-3xl leading-tight sm:text-5xl">What is the truest word for today?</h2>
                 <div className="mt-8 grid gap-2 sm:grid-cols-5">
                   {MOODS.map((item) => (
-                    <button type="button" key={item.value} onClick={() => { setMoodChoice(item.value); setStep("context"); }} className={`group min-h-28 rounded-2xl border p-3 text-left transition-all sm:min-h-36 ${mood === item.value ? "border-[#c9d8b5] bg-[#c9d8b5] text-[#18212b]" : "border-white/10 bg-white/[0.03] text-white hover:border-white/30 hover:bg-white/[0.07]"}`}>
-                      <span className="mb-8 block size-5 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span className="block text-sm font-semibold">{item.name}</span><span className={`mt-1 block text-[11px] leading-4 ${mood === item.value ? "text-[#18212b]/60" : "text-white/40"}`}>{item.detail}</span>
-                    </button>
+                    <motion.button type="button" key={item.value} whileTap={{ scale: 0.96 }} onClick={() => { setMoodChoice(item.value); setStep("context"); }} className={`group relative min-h-32 overflow-hidden rounded-2xl border p-3 text-left transition-colors sm:min-h-36 ${mood === item.value ? "border-[#c9d8b5] bg-[#c9d8b5] text-[#18212b]" : "border-white/10 bg-white/[0.03] text-white hover:border-white/30 hover:bg-white/[0.07]"}`}>
+                      <motion.span animate={mood === item.value ? { scale: [1, 1.45, 1], opacity: [1, 0.45, 1] } : { scale: 1, opacity: 1 }} transition={{ duration: 0.7, ease: "easeOut" }} className="absolute -right-5 -top-5 size-20 rounded-full blur-xl" style={{ backgroundColor: item.color }} />
+                      <motion.span animate={mood === item.value ? { scale: [1, 1.15, 1], rotate: [0, -8, 8, 0] } : { scale: 1, rotate: 0 }} transition={{ duration: 0.55 }} className="relative z-10 mb-6 block text-3xl leading-none" role="img" aria-label={item.name}>{item.emoji}</motion.span>
+                      <span className="relative z-10 block text-sm font-semibold">{item.name}</span><span className={`relative z-10 mt-1 block text-[11px] leading-4 ${mood === item.value ? "text-[#18212b]/60" : "text-white/40"}`}>{item.detail}</span>
+                    </motion.button>
                   ))}
                 </div>
                 <p className="mt-6 text-xs text-white/35">There is no better or worse answer. Noticing is enough.</p>

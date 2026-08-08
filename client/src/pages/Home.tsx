@@ -42,53 +42,23 @@ const itemVariants: Variants = {
   },
 };
 
-function getGateKey(): string {
-  return `mentebloom_gate_${new Date().toISOString().split("T")[0]}`;
-}
-
-function hasCompletedTodayCheckIn(): boolean {
-  try {
-    return window.localStorage.getItem(getGateKey()) === "done";
-  } catch {
-    return false;
-  }
-}
-
 export default function Home() {
-  const [gateDone, setGateDone] = useState<boolean>(hasCompletedTodayCheckIn);
+  const [showMoodCheckIn, setShowMoodCheckIn] = useState(false);
 
-  const handleGateComplete = () => {
-    try {
-      window.localStorage.setItem(getGateKey(), "done");
-    } catch {
-      // Continue without persistence when storage is unavailable.
-    }
-    setGateDone(true);
-  };
-
-  const handleResetCheckIn = () => {
-    try {
-      window.localStorage.removeItem(getGateKey());
-    } catch {
-      // Continue without persistence when storage is unavailable.
-    }
-    setGateDone(false);
-  };
+  const openMoodCheckIn = () => setShowMoodCheckIn(true);
+  const closeMoodCheckIn = () => setShowMoodCheckIn(false);
 
   return (
     <div className="min-h-screen bg-[#faf8f5] text-[#1a1a1a]">
       <AnimatePresence mode="wait">
-        {!gateDone ? (
-          <MoodGate key="gate" onComplete={handleGateComplete} />
-        ) : (
-          <motion.div
+        <motion.div
             key="dashboard"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <Suspense fallback={<DashboardLoading />}>
-              <TopNav onResetCheckIn={handleResetCheckIn} />
+              <TopNav onResetCheckIn={openMoodCheckIn} />
 
             <main className="container max-w-[1280px] mx-auto px-4 lg:px-8 pb-8">
               {/* Hero Section */}
@@ -156,9 +126,12 @@ export default function Home() {
 
               <AppFooter />
             </Suspense>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+  </motion.div>
+  </AnimatePresence>
+
+  <AnimatePresence>
+    {showMoodCheckIn && <MoodGate key="mood-check-in" onComplete={closeMoodCheckIn} />}
+  </AnimatePresence>
+  </div>
   );
 }
