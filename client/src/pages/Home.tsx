@@ -4,7 +4,7 @@
  * Today's Note is the ONLY dark card (black bg with white/green text)
  * MoodGate appears first as full-screen overlay, then reveals the dashboard
  */
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useState, type ReactNode } from "react";
 import { MoodGate } from "@/components/MoodGate";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Variants } from "framer-motion";
@@ -34,13 +34,30 @@ function DashboardLoading() {
 }
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 12 },
+  hidden: { opacity: 0, y: 28, scale: 0.985 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35 },
+    scale: 1,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
   },
 };
+
+/** Wraps a dashboard section so it glides into view as the user scrolls,
+ * rather than firing once on mount — this is what gives the page its
+ * smooth, "playing forward" feel while scrolling. */
+function ScrollReveal({ children }: { children: ReactNode }) {
+  return (
+    <motion.div
+      variants={itemVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 function getGateKey(): string {
   return `mentebloom_gate_${new Date().toISOString().split("T")[0]}`;
@@ -93,65 +110,61 @@ export default function Home() {
             <main className="container max-w-[1280px] mx-auto px-4 lg:px-8 pb-8">
               {/* Hero Section */}
               <motion.div
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 <HeroSection />
               </motion.div>
 
               {/* Main Two-Column Layout */}
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                className="mt-6"
-              >
+              <div className="mt-6">
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5">
                   {/* Left Column — Primary Content */}
                   <div className="space-y-5">
-                    <motion.div variants={itemVariants}>
+                    <ScrollReveal>
                       <HabitsTable />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <TodaysNote />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <IntentionsWidget />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <WeeklyPulse />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <JournalWidget />
-                    </motion.div>
+                    </ScrollReveal>
                   </div>
 
                   {/* Right Column — Wellness Widgets */}
                   <div className="space-y-5">
-                    <motion.div variants={itemVariants}>
+                    <ScrollReveal>
                       <HydrationWidget />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <WellnessScore />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <MoodHistory />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <QuoteWidget />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <MilestonesWidget />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <WellnessAnalytics />
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
+                    </ScrollReveal>
+                    <ScrollReveal>
                       <StreakFooter />
-                    </motion.div>
+                    </ScrollReveal>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </main>
 
               <AppFooter />

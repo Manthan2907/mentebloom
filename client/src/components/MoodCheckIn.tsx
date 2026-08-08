@@ -1,41 +1,36 @@
 /**
- * MoodCheckIn — Mood tracker widget
- * Uses custom SVG illustrated faces instead of emojis
- * Editorial Theme: Light white card
+ * MoodCheckIn — Dashboard mood widget
+ * Glass card with a subtle mood-tinted glow, a sliding glass-pill selector
+ * (shared visual language with MoodGate), and a smooth week strip.
  */
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore, DAY_SHORT } from "@/lib/store";
 import type { Mood } from "@/lib/store";
-import { MoodFace, MOOD_COLORS, MOOD_LABELS, getMoodText } from "./MoodFaces";
+import { GlassOrb, MOOD_GRADIENTS, MOOD_LABELS, getMoodText } from "./MoodFaces";
 
-const MOODS: { value: Mood; label: string; color: string }[] = [
-  { value: "sad", label: "Sad", color: "#e07b39" },
-  { value: "low", label: "Low", color: "#e6a23c" },
-  { value: "okay", label: "Neutral", color: "#f0c040" },
-  { value: "good", label: "Good", color: "#7cb342" },
-  { value: "great", label: "Great", color: "#c8f54e" },
+const MOODS: { value: Mood; label: string }[] = [
+  { value: "sad", label: "Sad" },
+  { value: "low", label: "Low" },
+  { value: "okay", label: "Neutral" },
+  { value: "good", label: "Good" },
+  { value: "great", label: "Great" },
 ];
 
 const FACTORS = ["Work", "Study", "Family", "Sleep", "Health"];
+
+function hexWithAlpha(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 export function MoodCheckIn() {
   const { todayMood, moodFactors, moodHistory, setMood } = useStore();
   const [selectedMood, setSelectedMood] = useState<Mood | null>(todayMood);
   const [selectedFactors, setSelectedFactors] = useState<string[]>(moodFactors);
   const [submitted, setSubmitted] = useState(!!todayMood);
-
-  const handleMoodSelect = (mood: Mood) => {
-    setSelectedMood(mood);
-  };
-
-  const handleFactorToggle = (factor: string) => {
-    setSelectedFactors((prev) =>
-      prev.includes(factor)
-        ? prev.filter((f) => f !== factor)
-        : [...prev, factor]
-    );
-  };
 
   const handleSubmit = () => {
     if (selectedMood) {
@@ -45,8 +40,6 @@ export function MoodCheckIn() {
   };
 
   const reset = () => {
-    setSelectedMood(null);
-    setSelectedFactors([]);
     setSubmitted(false);
   };
 
@@ -64,9 +57,22 @@ export function MoodCheckIn() {
   };
 
   const weekMoods = getWeekMoods();
+  const glowColor = selectedMood ? MOOD_GRADIENTS[selectedMood][1] : "#c8f54e";
 
   return (
-    <div className="bg-white rounded-xl border border-[#e8e4df] p-6 shadow-sm">
+    <div
+      className="relative overflow-hidden rounded-2xl border border-white/40 bg-white/60 p-6 shadow-sm backdrop-blur-xl"
+      style={{
+        boxShadow: `0 1px 0 rgba(255,255,255,0.6) inset, 0 20px 40px -20px ${hexWithAlpha(glowColor, 0.35)}`,
+      }}
+    >
+      {/* mood-tinted ambient glow */}
+      <motion.div
+        className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full blur-3xl"
+        animate={{ backgroundColor: hexWithAlpha(glowColor, 0.35) }}
+        transition={{ duration: 0.6 }}
+      />
+
       <AnimatePresence mode="wait">
         {!submitted ? (
           <motion.div
@@ -74,61 +80,83 @@ export function MoodCheckIn() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            className="relative"
           >
-            {/* Header */}
-            <div className="text-center mb-6">
-              <MoodFace mood={selectedMood || "okay"} size={64} />
+            <div className="mb-6 text-center">
+              <motion.div
+                key={`orb-${selectedMood}`}
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                className="mx-auto"
+              >
+                <GlassOrb mood={selectedMood} size={64} active={!!selectedMood} />
+              </motion.div>
               <h3 className="font-display text-xl font-bold text-[#1a1a1a] mt-3">
                 How are you feeling today?
               </h3>
-              <p className="text-sm text-[#1a1a1a]/40 mt-1 font-sans">
-                {getMoodText(selectedMood)}
-              </p>
+              <p className="text-sm text-[#1a1a1a]/40 mt-1 font-sans">{getMoodText(selectedMood)}</p>
             </div>
 
-            {/* Mood Selection */}
-            <div className="flex items-center justify-center gap-3 mb-6">
-              {MOODS.map((mood) => (
-                <motion.button
-                  key={mood.value}
-                  onClick={() => handleMoodSelect(mood.value)}
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`relative transition-all duration-200 ${
-                    selectedMood === mood.value
-                      ? "opacity-100"
-                      : "opacity-70 hover:opacity-100"
-                  }`}
-                  style={{
-                    boxShadow: selectedMood === mood.value ? `0 0 0 2px ${mood.color}` : "none",
-                  }}
-                >
-                  <MoodFace mood={mood.value} size={44} />
-                </motion.button>
-              ))}
+            {/* Sliding glass-pill selector */}
+            <div className="relative flex items-center justify-between gap-1 rounded-full border border-[#e8e4df] bg-[#faf8f5] p-1.5">
+              {MOODS.map((mood) => {
+                const isActive = selectedMood === mood.value;
+                return (
+                  <button
+                    key={mood.value}
+                    onClick={() => setSelectedMood(mood.value)}
+                    className="relative flex-1"
+                    aria-pressed={isActive}
+                    aria-label={`Select ${mood.label} mood`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="dashboard-mood-pill"
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background: `linear-gradient(135deg, ${MOOD_GRADIENTS[mood.value][0]}, ${MOOD_GRADIENTS[mood.value][1]})`,
+                        }}
+                        transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                      />
+                    )}
+                    <span
+                      className={`relative z-10 flex items-center justify-center rounded-full px-2 py-2 text-[11px] font-mono uppercase tracking-wide transition-colors ${
+                        isActive ? "text-[#1a1a1a] font-semibold" : "text-[#1a1a1a]/40 hover:text-[#1a1a1a]/70"
+                      }`}
+                    >
+                      {mood.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Factor Selection */}
+            {/* Factor selection */}
             <AnimatePresence>
               {selectedMood && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mb-5"
+                  initial={{ opacity: 0, y: 10, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
                 >
-                  <p className="text-xs font-mono text-[#1a1a1a]/40 text-center mb-3">
+                  <p className="text-xs font-mono text-[#1a1a1a]/40 text-center mt-5 mb-3">
                     What affected your mood?
                   </p>
-                  <div className="flex flex-wrap items-center justify-center gap-2">
+                  <div className="flex flex-wrap items-center justify-center gap-2 pb-1">
                     {FACTORS.map((factor) => (
                       <button
                         key={factor}
-                        onClick={() => handleFactorToggle(factor)}
-                        className={`text-xs font-mono px-3 py-1.5 rounded-sm transition-all ${
+                        onClick={() =>
+                          setSelectedFactors((prev) =>
+                            prev.includes(factor) ? prev.filter((f) => f !== factor) : [...prev, factor]
+                          )
+                        }
+                        className={`text-xs font-mono px-3 py-1.5 rounded-full transition-all ${
                           selectedFactors.includes(factor)
-                            ? "bg-[#c8f54e]/15 text-[#1a1a1a] border border-[#c8f54e]/40"
-                            : "bg-[#faf8f5] text-[#1a1a1a]/40 border border-[#e0dcd7] hover:border-[#c8f54e]/30"
+                            ? "bg-[#1a1a1a] text-white"
+                            : "bg-white text-[#1a1a1a]/40 border border-[#e0dcd7] hover:border-[#1a1a1a]/30"
                         }`}
                       >
                         {factor}
@@ -139,12 +167,11 @@ export function MoodCheckIn() {
               )}
             </AnimatePresence>
 
-            {/* Submit */}
-            <div className="text-center">
+            <div className="text-center mt-5">
               <button
                 onClick={handleSubmit}
                 disabled={!selectedMood}
-                className="text-xs font-mono tracking-wider bg-[#c8f54e] text-[#1a1a1a] px-6 py-2.5 rounded-sm hover:bg-[#d4f76a] transition-colors disabled:opacity-30 disabled:cursor-not-allowed uppercase font-semibold"
+                className="text-xs font-mono tracking-wider bg-[#1a1a1a] text-white px-6 py-2.5 rounded-full hover:bg-[#1a1a1a]/85 transition-colors disabled:opacity-30 disabled:cursor-not-allowed uppercase font-semibold"
               >
                 Save Mood
               </button>
@@ -156,26 +183,21 @@ export function MoodCheckIn() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
+            className="relative"
           >
-            {/* Today's Mood */}
-            <div className="text-center mb-5">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <MoodFace mood={selectedMood} size={48} />
-                <div className="text-left">
-                  <h3 className="font-display text-lg font-bold text-[#1a1a1a]">
-                    Today's Mood
-                  </h3>
-                  <p className="text-xs text-[#1a1a1a]/40 mt-0.5">
-                    {selectedMood ? MOOD_LABELS[selectedMood] : "Not recorded"}
-                    {selectedFactors.length > 0 && (
-                      <span className="text-[#1a1a1a]/30"> · {selectedFactors.join(", ")}</span>
-                    )}
-                  </p>
-                </div>
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <GlassOrb mood={selectedMood} size={48} />
+              <div className="text-left">
+                <h3 className="font-display text-lg font-bold text-[#1a1a1a]">Today&apos;s Mood</h3>
+                <p className="text-xs text-[#1a1a1a]/40 mt-0.5">
+                  {selectedMood ? MOOD_LABELS[selectedMood] : "Not recorded"}
+                  {selectedFactors.length > 0 && (
+                    <span className="text-[#1a1a1a]/30"> · {selectedFactors.join(", ")}</span>
+                  )}
+                </p>
               </div>
             </div>
 
-            {/* This Week */}
             <div>
               <p className="text-[10px] font-mono text-[#1a1a1a]/25 tracking-wider text-center mb-3 uppercase">
                 This Week
@@ -184,21 +206,18 @@ export function MoodCheckIn() {
                 {weekMoods.map((mood, i) => (
                   <div key={i} className="flex flex-col items-center gap-1">
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: i * 0.06, duration: 0.2 }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 20 }}
                     >
-                      <MoodFace mood={mood} size={24} />
+                      <GlassOrb mood={mood} size={26} />
                     </motion.div>
-                    <span className="text-[9px] font-mono text-[#1a1a1a]/20">
-                      {DAY_SHORT[i]}
-                    </span>
+                    <span className="text-[9px] font-mono text-[#1a1a1a]/20">{DAY_SHORT[i]}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Reset */}
             <div className="text-center mt-4">
               <button
                 onClick={reset}

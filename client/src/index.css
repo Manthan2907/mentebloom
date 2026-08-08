@@ -226,3 +226,20 @@
   animation: glow-left 3.5s linear infinite 2.625s;
 }
 
+/* Aurora drift — slow living-gradient motion for the mood gate backdrop */
+@keyframes aurora-drift {
+  0% { transform: scale(1.05) translate(0, 0); }
+  50% { transform: scale(1.15) translate(-1.5%, 1%); }
+  100% { transform: scale(1.05) translate(0, 0); }
+}
+.animate-aurora-drift {
+  animation: aurora-drift 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Smooth scroll-reveal for dashboard sections */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+}
+

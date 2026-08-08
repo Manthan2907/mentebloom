@@ -1,18 +1,27 @@
 /**
- * MoodFaces — Custom SVG illustrated mood faces
- * Replaces emojis with flat-design illustrated faces
- * Each face has a color-coded circular background
- * Style: simple geometric faces with minimal features (eyes + mouth)
+ * MoodFaces — Premium glass-orb mood indicators
+ * Each mood renders as a softly lit glass sphere with a radial gradient,
+ * an animated specular highlight, and a minimal expressive arc — no flat
+ * dot-eyes. Designed to feel like a tactile, physical object rather than
+ * a static icon.
  */
 import React from "react";
 import type { Mood } from "@/lib/store";
 
 export const MOOD_COLORS: Record<Mood, string> = {
-  sad: "#e07b39",       // warm coral/orange
-  low: "#e6a23c",       // amber/golden
-  okay: "#f0c040",      // bright yellow-amber
-  good: "#7cb342",      // soft green
-  great: "#c8f54e",     // lime green (brand accent)
+  sad: "#ff8a65",
+  low: "#ffb74d",
+  okay: "#ffd54f",
+  good: "#9ccc65",
+  great: "#c8f54e",
+};
+
+export const MOOD_GRADIENTS: Record<Mood, [string, string]> = {
+  sad: ["#ff9a76", "#e2593c"],
+  low: ["#ffc773", "#e08a2a"],
+  okay: ["#ffe184", "#e0aa1f"],
+  good: ["#b6e07a", "#6f9e33"],
+  great: ["#e4ff9c", "#a9d92a"],
 };
 
 export const MOOD_LABELS: Record<Mood, string> = {
@@ -23,119 +32,115 @@ export const MOOD_LABELS: Record<Mood, string> = {
   great: "Great",
 };
 
-function SadFace({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <circle cx="40" cy="40" r="38" fill="#e07b39" />
-      {/* Left eye - simple dot */}
-      <circle cx="28" cy="32" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Right eye - simple dot */}
-      <circle cx="52" cy="32" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Sad mouth - downward curve */}
-      <path d="M28 52 C34 46, 46 46, 52 52" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" />
-    </svg>
-  );
-}
-
-function LowFace({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <circle cx="40" cy="40" r="38" fill="#e6a23c" />
-      {/* Left eye */}
-      <circle cx="28" cy="32" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Right eye */}
-      <circle cx="52" cy="32" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Slightly downturned mouth */}
-      <path d="M30 48 L50 48" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function OkayFace({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <circle cx="40" cy="40" r="38" fill="#f0c040" />
-      {/* Left eye */}
-      <circle cx="28" cy="32" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Right eye */}
-      <circle cx="52" cy="32" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Neutral straight mouth */}
-      <path d="M28 48 L52 48" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function GoodFace({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <circle cx="40" cy="40" r="38" fill="#7cb342" />
-      {/* Left eye */}
-      <circle cx="28" cy="30" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Right eye */}
-      <circle cx="52" cy="30" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Smiling mouth */}
-      <path d="M26 46 C32 54, 48 54, 54 46" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" />
-    </svg>
-  );
-}
-
-function GreatFace({ size = 48 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <circle cx="40" cy="40" r="38" fill="#c8f54e" />
-      {/* Left eye */}
-      <circle cx="28" cy="28" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Right eye */}
-      <circle cx="52" cy="28" r="3" fill="#1a1a1a" opacity="0.8" />
-      {/* Wide smile mouth */}
-      <path d="M24 44 C32 56, 48 56, 56 44" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" />
-    </svg>
-  );
-}
-
-const FACE_MAP: Record<Mood, React.FC<{ size?: number }>> = {
-  sad: SadFace,
-  low: LowFace,
-  okay: OkayFace,
-  good: GoodFace,
-  great: GreatFace,
-};
-
 const TEXT_MAP: Record<Mood, string> = {
-  sad: "I Feel Down.",
-  low: "I Feel Low.",
-  okay: "I Feel Neutral.",
-  good: "I Feel Good.",
-  great: "I Feel Great.",
+  sad: "I feel down.",
+  low: "I feel low.",
+  okay: "I feel neutral.",
+  good: "I feel good.",
+  great: "I feel great.",
 };
 
-export function MoodFace({ mood, size = 48 }: { mood: Mood | null; size?: number }) {
-  if (!mood) {
-    return (
-      <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-        <circle cx="40" cy="40" r="38" fill="#e8e4df" />
-        <circle cx="28" cy="32" r="3" fill="#1a1a1a" opacity="0.2" />
-        <circle cx="52" cy="32" r="3" fill="#1a1a1a" opacity="0.2" />
-        <path d="M28 48 L52 48" stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" opacity="0.2" />
-      </svg>
-    );
+/** Arc path for the expressive "mouth" line, drawn in a normalized 0-100 box */
+function arcFor(mood: Mood): string {
+  switch (mood) {
+    case "sad":
+      return "M32 66 C40 58, 60 58, 68 66";
+    case "low":
+      return "M34 62 L66 62";
+    case "okay":
+      return "M34 60 L66 60";
+    case "good":
+      return "M32 56 C40 66, 60 66, 68 56";
+    case "great":
+      return "M28 52 C38 68, 62 68, 72 52";
   }
-  const Component = FACE_MAP[mood];
-  return <Component size={size} />;
+}
+
+function eyeYFor(mood: Mood): number {
+  if (mood === "great") return 38;
+  if (mood === "good") return 40;
+  return 42;
+}
+
+let gradientSeq = 0;
+
+export function GlassOrb({
+  mood,
+  size = 48,
+  active = false,
+}: {
+  mood: Mood | null;
+  size?: number;
+  active?: boolean;
+}) {
+  const id = React.useMemo(() => `orb-${gradientSeq++}`, []);
+  const [from, to] = mood ? MOOD_GRADIENTS[mood] : ["#e8e4df", "#d3cec7"];
+  const eyeY = mood ? eyeYFor(mood) : 42;
+  const arc = mood ? arcFor(mood) : "M34 60 L66 60";
+
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+      <defs>
+        <radialGradient id={`${id}-fill`} cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stopColor={from} />
+          <stop offset="100%" stopColor={to} />
+        </radialGradient>
+        <radialGradient id={`${id}-glow`} cx="50%" cy="50%" r="50%">
+          <stop offset="60%" stopColor={to} stopOpacity="0" />
+          <stop offset="100%" stopColor={to} stopOpacity="0.35" />
+        </radialGradient>
+      </defs>
+
+      {/* soft outer glow when active */}
+      {active && <circle cx="50" cy="50" r="48" fill={`url(#${id}-glow)`} />}
+
+      {/* main sphere */}
+      <circle cx="50" cy="50" r="42" fill={`url(#${id}-fill)`} />
+
+      {/* rim light */}
+      <circle
+        cx="50"
+        cy="50"
+        r="42"
+        fill="none"
+        stroke="white"
+        strokeOpacity="0.35"
+        strokeWidth="1.2"
+      />
+
+      {/* specular highlight */}
+      <ellipse cx="36" cy="30" rx="14" ry="9" fill="white" opacity="0.32" />
+
+      {mood && (
+        <>
+          <circle cx="38" cy={eyeY} r="3" fill="#1a1a1a" opacity="0.72" />
+          <circle cx="62" cy={eyeY} r="3" fill="#1a1a1a" opacity="0.72" />
+          <path d={arc} stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.72" />
+        </>
+      )}
+      {!mood && (
+        <path d={arc} stroke="#1a1a1a" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.18" />
+      )}
+    </svg>
+  );
+}
+
+/** Back-compat wrapper matching the previous MoodFace API */
+export function MoodFace({ mood, size = 48 }: { mood: Mood | null; size?: number }) {
+  return <GlassOrb mood={mood} size={size} />;
+}
+
+export function MoodFaceMini({ mood }: { mood: Mood | null }) {
+  if (!mood) return null;
+  return <GlassOrb mood={mood} size={26} />;
 }
 
 export function getMoodText(mood: Mood | null): string {
-  if (!mood) return "No mood selected.";
+  if (!mood) return "No mood recorded yet.";
   return TEXT_MAP[mood];
 }
 
 export function getMoodColor(mood: Mood | null): string {
   if (!mood) return "#e8e4df";
   return MOOD_COLORS[mood];
-}
-
-export function MoodFaceMini({ mood }: { mood: Mood | null }) {
-  if (!mood) return null;
-  const Component = FACE_MAP[mood];
-  return <Component size={28} />;
 }

@@ -31,7 +31,7 @@ export function MoodHistory() {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-[#e8e4df] p-6 shadow-sm">
+    <div className="rounded-2xl border border-white/40 bg-white/60 p-6 shadow-sm backdrop-blur-xl">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-[#c8f54e]" />
@@ -84,7 +84,7 @@ export function MoodHistory() {
               <motion.div
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 bg-white border border-[#e8e4df] rounded-sm px-3 py-2 shadow-lg pointer-events-none"
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 bg-white/90 backdrop-blur-md border border-white/60 rounded-xl px-3 py-2 shadow-lg pointer-events-none"
               >
                 <div className="text-center">
                   <span className="text-[10px] font-mono text-[#1a1a1a]/40 block">
